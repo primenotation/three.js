@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Three.js - Stock Chart on ShapeGeometry</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Additional styles specific to this page, if any, can go here or in style.css */
+        body {
+            background-color: #333; /* Darker background for the scene */
+            color: #fff;
+            /* Other body styles are in style.css */
+        }
+        #infoBar { /* Style for our existing info bar */
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.75);
+            color: white;
+            border-radius: 5px;
+            z-index: 100; /* Ensure it's above the 3D canvas */
+            font-size: 0.9em;
+        }
+        #infoBar p { margin: 5px 0; }
+        #infoBar button, #infoBar input { margin-top: 5px; }
+
+        /* chartContainer will be used by Lightweight Charts to render into.
+           We need its content for the texture.
+           It can be hidden if we only want to see the 3D texture.
+           For debugging, it's useful to see it initially. */
+        #chartContainer {
+            width: 800px; /* Define a fixed size for the canvas texture */
+            height: 600px; /* Define a fixed size for the canvas texture */
+            /* border: 1px solid red; */ /* Uncomment to see its position during debugging */
+            /* position: absolute; */    /* Optional: to position it off-screen */
+            /* left: -9999px; */        /* Optional: to position it off-screen */
+            /* visibility: hidden; */   /* Optional: to hide it once texturing works */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="infoBar">
+        <p>Date/Time: <span id="currentDateTime">-</span></p>
+        <p>Open: <span id="currentOpen">-</span>, High: <span id="currentHigh">-</span>, Low: <span id="currentLow">-</span>, Close: <span id="currentClose">-</span></p>
+        <button id="playPauseButton">Play</button>
+        Speed: <input type="range" id="speedControl" min="1" max="10" value="2" title="Replay Speed">
+    </div>
+
+    <div id="chartContainer"></div>
+
+    <!-- Ensure these paths correctly point to where you've placed the Three.js module files
+         within your static folder. Example: static/js/three/build/three.module.js -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "{{ url_for('static', filename='js/three/build/three.module.js') }}",
+                "three/addons/": "{{ url_for('static', filename='js/three/examples/jsm/') }}"
+            }
+        }
+    </script>
+
+    <script src="https://unpkg.com/lightweight-charts@4.2.1/dist/lightweight-charts.standalone.production.js"></script>
+
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+</html>

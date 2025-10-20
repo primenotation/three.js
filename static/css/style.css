@@ -1,0 +1,22 @@
+/* static/css/style.css */
+
+/* Basic body reset for consistency (optional, as some is in index.html) */
+body {
+    margin: 0;
+    font-family: Monospace, sans-serif; /* Matches font in index.html inline style */
+    /* background-color: #000; */ /* Already set in index.html inline style */
+    /* color: #fff; */ /* Already set in index.html inline style */
+    /* overflow: hidden; */ /* Already set in index.html inline style */
+}
+
+/* You can add more global styles here as your project grows.
+   For example, global link styles, default button styles, etc.
+   Right now, specific component styles are in index.html.
+*/
+
+/* Example: A global style for canvas elements if needed, though Three.js appends its own */
+/*
+canvas {
+    display: block;
+}
+*/
