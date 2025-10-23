@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>three.js css3d - periodic table</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link type="text/css" rel="stylesheet" href="main.css">
+        <style>
+            body { background-color: #000; margin: 0; font-family: Helvetica, sans-serif; color: #fff; overflow: hidden; }
+            a { color: #8ff; }
+            #menu { position: absolute; bottom: 20px; width: 100%; text-align: center; z-index: 100; }
+            #side-panel { position: absolute; top: 80px; left: 20px; width: 280px; background: rgba(0,20,20,0.9); border: 1px solid rgba(127,255,255,0.25); border-radius: 5px; padding: 10px; color: rgba(127,255,255,0.85); z-index: 100; }
+            #side-panel h3 { margin-top:0; font-weight:bold; font-size:16px; border-bottom:1px solid rgba(127,255,255,0.25); padding-bottom:5px; }
+            #side-panel label { display:block; margin:5px 0; cursor:pointer; font-size:14px; }
+            .sort-indicator { display:inline-block; width:18px; text-align:center; margin-left:8px; cursor:pointer; color:rgba(127,255,255,0.5); user-select:none; font-weight:bold; }
+            .sort-indicator.active { color:#8ff; }
+            .element { width:150px; height:200px; box-shadow:0 0 12px rgba(0,255,255,0.5); border:1px solid rgba(127,255,255,0.25); font-family:Helvetica, sans-serif; text-align:center; line-height:normal; cursor:default; position:relative; border-radius:6px; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; padding:10px; box-sizing:border-box; }
+            .element .number { position:absolute; top:6px; left:8px; font-size:11px; color:rgba(200,255,255,0.85); }
+            .element .symbol { font-size:48px; font-weight:bold; color:#fff; text-shadow:0 0 10px rgba(0,255,255,0.95); margin-top:12px; }
+            .element .main-details { font-size:12px; color:rgba(220,255,255,0.95); }
+            .element .details-expand { font-size:11px; color:rgba(220,250,250,0.95); max-height:0; overflow:hidden; transition:max-height .3s ease; }
+            .element:hover .details-expand { max-height:80px; }
+            .badge { position:absolute; font-size:14px; }
+            .top-right { top:6px; right:8px; }
+            .bottom-right { bottom:6px; right:8px; font-size:11px; background:rgba(0,0,0,0.45); padding:2px 6px; border-radius:3px; }
+            input[type="color"], input[type="number"] { margin-left:8px; vertical-align:middle; }
+            small.info { display:block; margin-top:6px; color:rgba(180,255,255,0.6); }
+            hr { border-color: rgba(127,255,255,0.12); }
+            button { color: rgba(127,255,255,0.75); background: transparent; outline: 1px solid rgba(127,255,255,0.75); border:0; padding:5px 10px; cursor:pointer; margin:0 4px; }
+            button:hover { background-color: rgba(0,255,255,0.5); }
+        </style>
+    </head>
+    <body>
+        <div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - periodic table.</div>
+        <div id="container"></div>
+
+        <div id="side-panel">
+            <h3>Display & Sort</h3>
+            <label><input type="checkbox" class="display-option" value="Name" checked> Name <span class="sort-indicator" data-key="Name" title="Click to sort">—</span></label>
+            <label><input type="checkbox" class="display-option" value="AtomicWeight" checked> Atomic Weight <span class="sort-indicator" data-key="AtomicWeight" title="Click to sort">—</span></label>
+            <label><input type="checkbox" class="display-option" value="PricePerGramUSD"> Price/g (USD) <span class="sort-indicator" data-key="PricePerGramUSD" title="Click to sort">—</span></label>
+            <label><input type="checkbox" class="display-option" value="RarityTier"> Rarity Tier <span class="sort-indicator" data-key="RarityTier" title="Click to sort">—</span></label>
+            <label><input type="checkbox" class="display-option" value="StateAtSTP"> State at STP <span class="sort-indicator" data-key="StateAtSTP" title="Click to sort">—</span></label>
+            <label><input type="checkbox" class="display-option" value="ColorEmoji" checked> Emoji <span class="sort-indicator" data-key="ColorEmoji" title="Click to sort">—</span></label>
+
+            <hr/>
+
+            <h3>Card Appearance</h3>
+            <label> Base Color: <input type="color" id="card-color" value="#007f7f"></label>
+            <label style="margin-top:6px;"><input type="checkbox" id="multicolour"> Multicolour by Group</label>
+            <label style="margin-top:6px;">Grid Rows: <input type="number" id="grid-rows" value="5" min="1" max="20"></label>
+            <label>Grid Cols: <input type="number" id="grid-cols" value="5" min="1" max="20"></label>
+            <label style="margin-top:6px;"><input type="checkbox" id="preserve-shades" checked> Preserve subtle shades when base color chosen</label>
+            <small class="info">Click arrow to cycle sort: none → desc (▼) → asc (▲) → none</small>
+        </div>
+
+        <div id="menu">
+            <button id="table">TABLE</button>
+            <button id="sphere">SPHERE</button>
+            <button id="helix">HELIX</button>
+            <button id="grid">GRID</button>
+        </div>
+
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+                    "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+                }
+            }
+        </script>
+
+        <script type="module">
+            import * as THREE from 'three';
+            import TWEEN from 'three/addons/libs/tween.module.js';
+            import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+            import { CSS3DRenderer, CSS3DObject } from 'three/addons/renderers/CSS3DRenderer.js';
+
+            let camera, scene, renderer, controls;
+            let tableData = [];
+            const objects = [];
+            const targets = { table: [], sphere: [], helix: [], grid: [] };
+            const sortState = { key: null, dir: 0 }; // 0 none, 1 desc, 2 asc
+
+            // group color mapping (rainbow emphasis for requested groups)
+            const groupColorMap = {
+                "Group 1": "#FF3B30", // Alkali - red
+                "Alkali Metal": "#FF3B30",
+                "Group 2": "#FF9500", // Alkaline earth - orange
+                "Alkaline Earth Metal": "#FF9500",
+                "Group 17": "#FFD60A", // Halogens - yellow
+                "Halogen": "#FFD60A",
+                "Group 18": "#34C759", // Noble gases - green
+                "Noble Gas": "#34C759",
+                "Transition Metal": "#0A84FF", // Groups 3-12 - blue
+                "Post-transition Metal": "#8E8E93",
+                "Metalloid": "#AF52DE",
+                "Nonmetal": "#5AC8FA",
+                "Lanthanide": "#FF9F0A",
+                "Actinide": "#FF2D55",
+                "Unknown": "#999999"
+            };
+
+            // utils for color manip
+            function hexToRgb(hex) {
+                const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return m ? { r: parseInt(m[1],16), g: parseInt(m[2],16), b: parseInt(m[3],16) } : null;
+            }
+            function rgbToHex(r,g,b) { return "#" + ((1<<24) + (r<<16) + (g<<8) + b).toString(16).slice(1).toUpperCase(); }
+            function rgbToHsl(r,g,b) {
+                r/=255; g/=255; b/=255;
+                const max = Math.max(r,g,b), min = Math.min(r,g,b);
+                let h=0,s=0,l=(max+min)/2;
+                if(max!==min){
+                    const d = max-min;
+                    s = l>0.5? d/(2-max-min) : d/(max+min);
+                    switch(max){ case r: h=(g-b)/d + (g<b?6:0); break; case g: h=(b-r)/d + 2; break; case b: h=(r-g)/d + 4; break; }
+                    h/=6;
+                }
+                return [h,s,l];
+            }
+            function hslToRgb(h,s,l){
+                let r,g,b;
+                if(s===0) r=g=b=l;
+                else {
+                    const hue2rgb = (p,q,t) => { if(t<0) t+=1; if(t>1) t-=1; if(t<1/6) return p+(q-p)*6*t; if(t<1/2) return q; if(t<2/3) return p+(q-p)*(2/3-t)*6; return p; };
+                    const q = l<0.5 ? l*(1+s) : l + s - l*s;
+                    const p = 2*l - q;
+                    r = hue2rgb(p,q,h+1/3); g = hue2rgb(p,q,h); b = hue2rgb(p,q,h-1/3);
+                }
+                return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
+            }
+            function darkenColor(rgb, percent){
+                const factor = 1 - percent/100;
+                return { r: Math.max(0, Math.round(rgb.r * factor)), g: Math.max(0, Math.round(rgb.g * factor)), b: Math.max(0, Math.round(rgb.b * factor)) };
+            }
+
+            init();
+            animate();
+
+            async function init() {
+                try {
+                    const resp = await fetch('elements.json');
+                    if(!resp.ok) throw new Error('elements.json load failed: ' + resp.status);
+                    tableData = await resp.json();
+                } catch(e) {
+                    console.error(e);
+                    document.getElementById('info').textContent = 'Error loading elements.json - run on local server.';
+                    return;
+                }
+
+                camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight, 1, 10000);
+                camera.position.z = 3000;
+                scene = new THREE.Scene();
+
+                // Create cards
+                tableData.forEach((el, i) => {
+                    const elDiv = document.createElement('div');
+                    elDiv.className = 'element';
+                    elDiv.dataset.index = i;
+                    elDiv.dataset.groupname = (el.Group || el.Category || el.Block || '').toString();
+
+                    const num = document.createElement('div'); num.className = 'number'; num.textContent = el.AtomicNumber || (i+1);
+                    const sym = document.createElement('div'); sym.className = 'symbol'; sym.textContent = el.Symbol || '';
+                    const main = document.createElement('div'); main.className = 'main-details';
+                    const expand = document.createElement('div'); expand.className = 'details-expand';
+                    const topRight = document.createElement('div'); topRight.className = 'badge top-right';
+                    const bottomRight = document.createElement('div'); bottomRight.className = 'badge bottom-right';
+
+                    elDiv.appendChild(num); elDiv.appendChild(sym); elDiv.appendChild(main); elDiv.appendChild(expand);
+                    elDiv.appendChild(topRight); elDiv.appendChild(bottomRight);
+
+                    const obj = new CSS3DObject(elDiv);
+                    obj.position.x = Math.random()*4000 - 2000;
+                    obj.position.y = Math.random()*4000 - 2000;
+                    obj.position.z = Math.random()*4000 - 2000;
+                    scene.add(obj);
+                    objects.push(obj);
+
+                    // table arrangement (use supplied Row/Column or fallback)
+                    const target = new THREE.Object3D();
+                    const col = (typeof el.Column === 'number') ? el.Column : (i % 18 + 1);
+                    const row = (typeof el.Row === 'number') ? el.Row : (Math.floor(i/18) + 1);
+                    target.position.x = (col * 140) - 1330;
+                    target.position.y = - (row * 180) + 990;
+                    targets.table.push(target);
+                });
+
+                // sphere
+                const vector = new THREE.Vector3();
+                for(let i=0,l=objects.length;i<l;i++){
+                    const phi = Math.acos(-1 + (2*i)/l);
+                    const theta = Math.sqrt(l * Math.PI) * phi;
+                    const o = new THREE.Object3D();
+                    o.position.setFromSphericalCoords(800, phi, theta);
+                    vector.copy(o.position).multiplyScalar(2); o.lookAt(vector);
+                    targets.sphere.push(o);
+                }
+
+                // helix
+                for(let i=0,l=objects.length;i<l;i++){
+                    const theta = i * 0.175 + Math.PI;
+                    const y = - ( i * 8 ) + 450;
+                    const o = new THREE.Object3D();
+                    o.position.setFromCylindricalCoords(900, theta, y);
+                    vector.x = o.position.x*2; vector.y = o.position.y; vector.z = o.position.z*2;
+                    o.lookAt(vector);
+                    targets.helix.push(o);
+                }
+
+                // initial grid targets use default rows/cols (can be changed by UI)
+                createGridTargets();
+
+                renderer = new CSS3DRenderer(); renderer.setSize(window.innerWidth, window.innerHeight);
+                document.getElementById('container').appendChild(renderer.domElement);
+
+                controls = new TrackballControls(camera, renderer.domElement);
+                controls.minDistance = 500; controls.maxDistance = 6000; controls.addEventListener('change', render);
+
+                // buttons
+                document.getElementById('table').addEventListener('click', () => { clearSortState(); transform(targets.table, 2000); });
+                document.getElementById('sphere').addEventListener('click', () => { clearSortState(); transform(targets.sphere, 2000); });
+                document.getElementById('helix').addEventListener('click', () => { clearSortState(); transform(targets.helix, 2000); });
+                document.getElementById('grid').addEventListener('click', () => { clearSortState(); transform(targets.grid, 2000); });
+
+                // side panel listeners
+                document.querySelectorAll('.display-option').forEach(cb => cb.addEventListener('change', updateAllCards));
+                document.getElementById('card-color').addEventListener('input', () => { updateCardColors(); });
+                document.getElementById('multicolour').addEventListener('change', updateCardColors);
+                document.getElementById('preserve-shades').addEventListener('change', updateCardColors);
+                document.getElementById('grid-rows').addEventListener('change', () => { createGridTargets(); updateSortIndicators(); if(sortState.key) applySort(); });
+                document.getElementById('grid-cols').addEventListener('change', () => { createGridTargets(); updateSortIndicators(); if(sortState.key) applySort(); });
+
+                document.querySelectorAll('.sort-indicator').forEach(span => {
+                    span.addEventListener('click', () => {
+                        const key = span.dataset.key;
+                        if (sortState.key !== key) { sortState.key = key; sortState.dir = 1; } 
+                        else { sortState.dir = (sortState.dir + 1) % 3; if(sortState.dir === 0) sortState.key = null; }
+                        updateSortIndicators();
+                        applySort();
+                    });
+                });
+
+                updateAllCards();
+                updateSortIndicators();
+                transform(targets.table, 2000);
+                window.addEventListener('resize', onWindowResize);
+            }
+
+            function createGridTargets() {
+                // Use spacing algorithm from 1_table_i: rows x cols layout per layer
+                const rows = Math.max(1, parseInt(document.getElementById('grid-rows').value) || 5);
+                const cols = Math.max(1, parseInt(document.getElementById('grid-cols').value) || 5);
+                const num = objects.length;
+                const cardW = 150 + 40; // card width + margin
+                const cardH = 200 + 40; // card height + margin
+                const layerDepth = 1000;
+                const itemsPerLayer = rows * cols;
+                targets.grid = new Array(num);
+                for (let i = 0; i < num; i++) {
+                    const layer = Math.floor(i / itemsPerLayer);
+                    const indexInLayer = i % itemsPerLayer;
+                    const col = indexInLayer % cols;
+                    const row = Math.floor(indexInLayer / cols);
+                    const o = new THREE.Object3D();
+                    o.position.x = (col * cardW) - ((cols - 1) * cardW / 2);
+                    o.position.y = - (row * cardH) + ((rows - 1) * cardH / 2);
+                    o.position.z = -layer * layerDepth + ((Math.ceil(num/itemsPerLayer) - 1) * layerDepth / 2);
+                    targets.grid[i] = o;
+                }
+            }
+
+            function getDisplayOptions() {
+                const opts = {};
+                document.querySelectorAll('.display-option').forEach(cb => opts[cb.value] = cb.checked);
+                return opts;
+            }
+
+            function updateAllCards() {
+                const opts = getDisplayOptions();
+                document.querySelectorAll('.element').forEach(el => {
+                    const idx = parseInt(el.dataset.index,10);
+                    const data = tableData[idx] || {};
+                    let main = '';
+                    if (opts.Name && data.Name) main += escapeHtml(String(data.Name)) + '<br>';
+                    if (opts.AtomicWeight && data.AtomicWeight) main += escapeHtml(String(data.AtomicWeight));
+                    el.querySelector('.main-details').innerHTML = main;
+                    let expand = '';
+                    if (opts.RarityTier && data.RarityTier) expand += `Rarity: ${escapeHtml(String(data.RarityTier))}<br>`;
+                    if (opts.PricePerGramUSD && data.PricePerGramUSD) expand += `Price: $${escapeHtml(String(data.PricePerGramUSD))}/g`;
+                    el.querySelector('.details-expand').innerHTML = expand;
+                    el.querySelector('.top-right').textContent = opts.ColorEmoji ? (data.ColorEmoji || '') : '';
+                    el.querySelector('.bottom-right').textContent = opts.StateAtSTP ? (data.StateAtSTP || '') : '';
+                });
+                updateCardColors();
+            }
+
+            function updateCardColors() {
+                const multicol = document.getElementById('multicolour').checked;
+                const baseHex = document.getElementById('card-color').value || '#007f7f';
+                const preserve = document.getElementById('preserve-shades').checked;
+                const baseRgb = hexToRgb(baseHex) || {r:0,g:127,b:127};
+
+                document.querySelectorAll('.element').forEach((el, i) => {
+                    const data = tableData[i] || {};
+                    let finalHex = baseHex;
+
+                    if (multicol) {
+                        // Prefer GroupNumber if available, otherwise map by Group string
+                        const groupNum = data.GroupNumber || data.GroupNo || data.group || null;
+                        if (groupNum) {
+                            if (Number(groupNum) === 1) finalHex = groupColorMap['Group 1'];
+                            else if (Number(groupNum) === 2) finalHex = groupColorMap['Group 2'];
+                            else if (Number(groupNum) >= 3 && Number(groupNum) <= 12) finalHex = groupColorMap['Transition Metal'];
+                            else if (Number(groupNum) === 17) finalHex = groupColorMap['Group 17'];
+                            else if (Number(groupNum) === 18) finalHex = groupColorMap['Group 18'];
+                            else finalHex = groupColorMap['Unknown'];
+                        } else {
+                            const gstr = (data.Group || data.Category || '').toString();
+                            if (/alkali/i.test(gstr)) finalHex = groupColorMap['Alkali Metal'];
+                            else if (/alkaline/i.test(gstr)) finalHex = groupColorMap['Alkaline Earth Metal'];
+                            else if (/noble/i.test(gstr)) finalHex = groupColorMap['Noble Gas'];
+                            else if (/halogen/i.test(gstr)) finalHex = groupColorMap['Halogen'];
+                            else if (/transition/i.test(gstr)) finalHex = groupColorMap['Transition Metal'];
+                            else finalHex = groupColorMap['Unknown'];
+                        }
+                    } else {
+                        // base color but preserve subtle shades to keep differences similar to 1_table_i
+                        if (preserve) {
+                            const [h,s,l] = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
+                            // create small lightness variation per element using atomic number / index
+                            const variation = ((i % 6) - 3) * 0.015; // between -0.045 and +0.03
+                            const nl = Math.max(0, Math.min(1, l + variation));
+                            const [r,g,b] = hslToRgb(h,s,nl);
+                            finalHex = rgbToHex(r,g,b);
+                        } else {
+                            finalHex = baseHex;
+                        }
+                    }
+
+                    const rgb = hexToRgb(finalHex) || baseRgb;
+                    // border/edge is slightly darker
+                    const edge = darkenColor(rgb, 18);
+                    el.style.backgroundColor = `rgba(${rgb.r},${rgb.g},${rgb.b},1)`;
+                    el.style.borderColor = `rgba(${edge.r},${edge.g},${edge.b},0.65)`;
+                    el.style.boxShadow = `0 0 12px rgba(${rgb.r},${rgb.g},${rgb.b},0.55)`;
+                });
+            }
+
+            function applySort() {
+                if (!sortState.key) { transform(targets.table, 1500); return; }
+                const arr = tableData.map((d,i) => {
+                    let v = d[sortState.key];
+                    if (typeof v === 'string') {
+                        const n = Number(String(v).replace(/[^0-9eE\.\-+]/g,''));
+                        if (!Number.isNaN(n) && String(v).trim() !== '') v = n;
+                    }
+                    return { i, v };
+                });
+                const dir = sortState.dir || 0;
+                arr.sort((a,b) => {
+                    const va = a.v, vb = b.v;
+                    if (typeof va === 'number' && typeof vb === 'number') return dir === 1 ? (vb - va) : (va - vb);
+                    const sa = String(va === undefined || va === null ? '' : va).toLowerCase();
+                    const sb = String(vb === undefined || vb === null ? '' : vb).toLowerCase();
+                    if (sa < sb) return dir === 1 ? 1 : -1;
+                    if (sa > sb) return dir === 1 ? -1 : 1;
+                    return 0;
+                });
+
+                // create mapping rank -> grid position using current targets.grid
+                const gridPositions = targets.grid.slice(0, arr.length);
+                const customTargets = new Array(objects.length);
+                for (let r=0; r<arr.length; r++) {
+                    const orig = arr[r].i;
+                    const pos = gridPositions[r % gridPositions.length] || new THREE.Object3D();
+                    const t = new THREE.Object3D();
+                    t.position.copy(pos.position);
+                    t.rotation.copy(pos.rotation || new THREE.Euler());
+                    customTargets[orig] = t;
+                }
+                for (let i=0;i<customTargets.length;i++) if(!customTargets[i]) { const t=new THREE.Object3D(); t.position.set(0,-5000,0); customTargets[i]=t; }
+                transformToTargetsArray(customTargets, 1500);
+            }
+
+            function updateSortIndicators() {
+                document.querySelectorAll('.sort-indicator').forEach(span => {
+                    const k = span.dataset.key;
+                    if (sortState.key === k && sortState.dir !== 0) { span.classList.add('active'); span.textContent = sortState.dir === 1 ? '▼' : '▲'; }
+                    else { span.classList.remove('active'); span.textContent = '—'; }
+                });
+            }
+            function clearSortState(){ sortState.key = null; sortState.dir = 0; updateSortIndicators(); }
+
+            function transform(targetsArr, duration) {
+                TWEEN.removeAll();
+                for (let i=0;i<objects.length;i++){
+                    const object = objects[i];
+                    const target = targetsArr[i];
+                    if (!target) continue;
+                    new TWEEN.Tween(object.position).to({ x: target.position.x, y: target.position.y, z: target.position.z }, Math.random()*duration + duration).easing(TWEEN.Easing.Exponential.InOut).start();
+                    new TWEEN.Tween(object.rotation).to({ x: (target.rotation && target.rotation.x) || 0, y: (target.rotation && target.rotation.y) || 0, z: (target.rotation && target.rotation.z) || 0 }, Math.random()*duration + duration).easing(TWEEN.Easing.Exponential.InOut).start();
+                }
+                new TWEEN.Tween({}).to({}, duration*2).onUpdate(render).start();
+            }
+
+            function transformToTargetsArray(targetsArray, duration) {
+                TWEEN.removeAll();
+                for (let i=0;i<objects.length;i++){
+                    const object = objects[i];
+                    const target = targetsArray[i];
+                    if (!target) continue;
+                    new TWEEN.Tween(object.position).to({ x: target.position.x, y: target.position.y, z: target.position.z }, Math.random()*duration + duration).easing(TWEEN.Easing.Exponential.InOut).start();
+                    new TWEEN.Tween(object.rotation).to({ x: (target.rotation && target.rotation.x) || 0, y: (target.rotation && target.rotation.y) || 0, z: (target.rotation && target.rotation.z) || 0 }, Math.random()*duration + duration).easing(TWEEN.Easing.Exponential.InOut).start();
+                }
+                new TWEEN.Tween({}).to({}, duration*2).onUpdate(render).start();
+            }
+
+            function onWindowResize() {
+                camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight); render();
+            }
+
+            function animate() { requestAnimationFrame(animate); TWEEN.update(); controls.update(); }
+            function render() { renderer.render(scene, camera); }
+            function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+
+        </script>
+    </body>
+</html>

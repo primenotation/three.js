@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>three.js css3d - contacts table (interactive selection)</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			html, body {
+				height: 100%;
+				margin: 0;
+				padding: 0;
+				background-color: #000000;
+				color: #ffffff;
+				font-family: Helvetica, sans-serif;
+				overflow: hidden; 
+			}
+
+			a {
+				color: #8ff;
+			}
+
+            #info {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                color: #fff;
+                padding: 5px 10px;
+                background-color: rgba(0,0,0,0.5);
+                border-radius: 3px;
+                z-index: 100; 
+            }
+            #errorMessage {
+                color: red;
+                margin-top: 5px;
+                font-weight: bold;
+            }
+             #loadingMessage {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: white;
+                font-size: 20px;
+                background-color: rgba(0,0,0,0.7);
+                padding: 20px;
+                border-radius: 10px;
+                z-index: 200; 
+                text-align: center;
+            }
+            #feedbackMessage {
+                position: fixed;
+                bottom: 70px; 
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: #33AA33;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 5px;
+                z-index: 200; 
+                opacity: 0;
+                transition: opacity 0.5s ease-in-out;
+                pointer-events: none; 
+            }
+            #feedbackMessage.show {
+                opacity: 1;
+            }
+            #feedbackMessage.select {
+                background-color: #337AB7;
+            }
+
+
+			#menu {
+				position: absolute;
+				bottom: 20px;
+				width: 100%;
+				text-align: center;
+                z-index: 100; 
+			}
+            .controls-container {
+                position: absolute;
+                top: 60px;
+                left: 10px;
+                background-color: rgba(40, 40, 40, 0.85);
+                padding: 15px;
+                border-radius: 8px;
+                color: #fff;
+                z-index: 100; 
+                width: 270px; 
+                max-height: calc(100vh - 80px); 
+                overflow-y: auto; 
+            }
+            .controls-container label, .controls-container h4 {
+                display: block;
+                margin-top: 10px;
+                margin-bottom: 3px;
+                font-size: 13px;
+            }
+             .controls-container h4 {
+                font-size: 14px;
+                margin-bottom: 8px;
+                border-bottom: 1px solid #555;
+                padding-bottom: 4px;
+             }
+            .controls-container input[type="range"],
+            .controls-container input[type="color"],
+            .controls-container input[type="number"],
+            .controls-container input[type="search"],
+            .controls-container button.control-button { /* Specific class for control buttons */
+                width: 100%;
+                box-sizing: border-box;
+                margin-bottom: 10px;
+                padding: 8px 5px; /* Adjusted padding for consistency */
+                border-radius: 3px;
+                border: 1px solid #555;
+                background-color: #555;
+                color: #fff;
+                cursor: pointer;
+            }
+            .controls-container button.control-button:hover {
+                background-color: #666;
+            }
+            .controls-container button.control-button.active-view,
+            .controls-container button.control-button.active-mode { 
+                background-color: #007F7F;
+                border-color: #00AFAF;
+            }
+             .controls-container input[type="color"] { /* Style for color input itself */
+                height: 30px;
+                padding: 2px;
+                width: calc(100% - 95px); /* Adjusted for new button-like label */
+                display: inline-block;
+                vertical-align: middle;
+                border-radius: 3px;
+                border: 1px solid #555; /* Match other inputs */
+                background-color: #333;
+             }
+            
+            .category-toggle-button { /* New style for category labels acting as buttons */
+                font-size: 11px;
+                display: inline-block;
+                width: 85px; 
+                padding: 4px 6px;
+                margin-right: 5px;
+                vertical-align: middle;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                cursor: pointer; 
+                border: 1px solid #777;
+                border-radius: 3px;
+                background-color: #444;
+                color: #ddd;
+                text-align: left;
+                transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            }
+            .category-toggle-button:hover {
+                background-color: #555;
+                border-color: #999;
+                color: #fff;
+            }
+            .category-toggle-button.active { /* Style for when category is selected/visible */
+                background-color: #007F7F;
+                border-color: #00AFAF;
+                color: #fff;
+                font-weight: bold;
+            }
+
+            .color-coding-section {
+                margin-top:10px; 
+                padding-left:15px; 
+                border-left: 2px solid #444;
+                padding-top: 5px;
+            }
+            .color-coding-section .color-picker-item {
+                margin-bottom: 3px;
+                display: flex;
+                align-items: center;
+            }
+            /* Styles for Calendar Mode */
+            #calendarControls {
+                margin-top: 15px;
+                padding-top: 10px;
+                border-top: 1px solid #555;
+            }
+             .calendar-view-buttons button {
+                width: calc(100% / 3);
+                display: inline-block;
+                box-sizing: border-box;
+                font-size: 11px;
+                padding-left: 2px;
+                padding-right: 2px;
+             }
+            .calendar-label { /* Style for day numbers */
+                font-family: Helvetica, sans-serif;
+                font-size: var(--day-number-font-size, 80px); /* Controlled by JS */
+                font-weight: bold;
+                color: rgba(255, 255, 255, 0.75);
+                user-select: none;
+                pointer-events: none;
+            }
+            .calendar-label-day-name { /* Style for S, M, T, W.. labels */
+                 font-size: 30px;
+                 color: rgba(255, 255, 255, 0.6);
+            }
+            .calendar-label-month-name { /* Style for month name labels */
+                 font-size: var(--month-name-font-size, 50px); /* Controlled by JS */
+                 font-weight: bold;
+                 color: rgba(255, 255, 255, 0.9);
+            }
+            .calendar-grid-line { /* Style for grid lines */
+                background-color: rgba(255, 255, 255, 0.25);
+                pointer-events: none;
+            }
+
+			.element { 
+                width: 150px;
+				height: 208px; 
+				text-align: center;
+                display: flex; 
+                flex-direction: column;
+                justify-content: space-between;
+                align-items: center;
+                box-sizing: border-box;
+                padding: 12px;
+                border-radius: 10px;
+                position: relative;
+                transform-style: preserve-3d;
+                transition: box-shadow 0.3s ease-out, border-color 0.3s ease-out, background-color 0.3s ease-out, opacity 0.4s ease-out;
+                user-select: none; 
+                cursor: pointer; /* Add cursor pointer for selection */
+			}
+            .element:hover { /* Add a subtle hover effect */
+                 border-color: rgba(255, 255, 255, 0.6) !important;
+            }
+            .element.hidden-by-visibility { /* For complete hiding by category toggle + dim switch off */
+                opacity: 0 !important;
+                pointer-events: none !important; 
+            }
+            .element.dimmed-by-visibility { /* For dimming by category toggle + dim switch on */
+                 opacity: 0.2 !important;
+            }
+            .element.dimmed-by-search { /* For dimming by search term (if not hidden/dimmed by visibility) */
+                opacity: 0.35 !important;
+            }
+            .element.search-highlight {
+                box-shadow: 0px 0px 25px rgba(255, 255, 0, 0.95) !important; 
+                border-color: rgba(255, 255, 100, 0.85) !important;
+                opacity: 1 !important; 
+            }
+            .element.card-selected { /* Halo for cards in the currently selected category OR individually selected */
+                box-shadow: 0px 0px 30px rgba(0, 150, 255, 0.8) !important; 
+                border-color: rgba(100, 200, 255, 0.75) !important;
+            }
+            .element .edge {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border-radius: 10px;
+                box-sizing: border-box;
+                transition: background-color 0.3s ease-out; 
+            }
+            .element > *:not(.edge) { 
+                position: relative;
+                z-index: 1; 
+            }
+            .element .age {
+                position: absolute;
+                top: 8px;
+                right: 10px;
+                font-size: 13px;
+                color: rgba(220,255,255,0.95);
+                background-color: rgba(0,0,0,0.4);
+                padding: 2px 5px;
+                border-radius: 3px;
+            }
+            .element .initials {
+                font-size: 48px;
+                font-weight: bold;
+                color: rgba(255,255,255,0.9);
+                margin-top: 10px;
+                transition: text-shadow 0.3s ease-out; 
+            }
+            .element .name {
+                font-size: 12px;
+                font-weight: bold;
+                color: rgba(230,255,255,1);
+                margin-top: 0px;
+                word-wrap: break-word;
+                max-width: 100%;
+                line-height: 1.2;
+            }
+            .element .details-section {
+                width: 100%;
+                margin-top: 8px;
+                background-color: rgba(0,0,0,0.15);
+                padding: 5px;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+            .element .detail-item {
+                font-size: 11px;
+                color: rgba(200,230,230,0.95);
+                margin-bottom: 3px;
+                text-align: left;
+                line-height: 1.2;
+            }
+            .element .detail-item strong {
+                color: rgba(220,250,250,1);
+            }
+            
+			#menu button { /* Ensure menu buttons are distinct from control buttons */
+				color: rgba(127,255,255,0.75);
+				background: transparent;
+				outline: 1px solid rgba(127,255,255,0.75);
+				border: 0px;
+				padding: 5px 10px;
+				cursor: pointer;
+                margin: 0 5px;
+			}
+			#menu button:hover {
+				background-color: rgba(0,255,255,0.5);
+			}
+			#menu button:active {
+				color: #000000;
+				background-color: rgba(0,255,255,0.75);
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+            <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - contacts table.
+            (Click to select, Ctrl/Cmd+Click to multi-select, 'F' to focus)
+            <div id="errorMessage"></div>
+        </div>
+        <div id="loadingMessage">Loading Contacts...</div>
+        <div id="feedbackMessage">Action complete!</div>
+
+        <div id="container"></div> 
+        <div class="controls-container">
+            <label for="searchInput">Search Contacts:</label>
+            <input type="search" id="searchInput" placeholder="Enter name, zodiac, etc.">
+
+            <label for="cardColorPicker">Card Color (Default):</label>
+            <input type="color" id="cardColorPicker" value="#007F7F">
+            
+            <label for="cardThicknessSlider">Card Thickness (px):</label>
+            <input type="range" id="cardThicknessSlider" min="0" max="20" value="0"> 
+            
+            <label for="layoutRows">Rows per Layer (Table/Grid):</label>
+            <input type="number" id="layoutRows" value="10" min="1" max="20">
+
+            <label for="layoutCols">Cols per Layer (Table/Grid):</label>
+            <input type="number" id="layoutCols" value="10" min="1" max="20">
+
+            <button id="recenterCameraBtn" class="control-button">Focus / Recenter (F)</button>
+            
+            <div>
+                <label>Camera View:</label>
+                <button id="perspectiveViewBtn" class="control-button active-view">Perspective</button>
+                <button id="orthographicViewBtn" class="control-button">Orthographic</button>
+            </div>
+            <label style="display: flex; align-items: center; margin-top: 15px;">
+                <input type="checkbox" id="dimNonVisibleSwitch" style="width: auto; margin-right: 5px;"> Dim Non-Visible Groups
+            </label>
+            
+             <div id="calendarControls" style="display: none;">
+                <h4>Calendar View</h4>
+                <div class="calendar-view-buttons">
+                    <button id="calendarWallBtn" class="control-button active-mode">Wall</button>
+                    <button id="calendarWheelBtn" class="control-button">Wheel</button>
+                    <button id="calendarFerrisBtn" class="control-button">Ferris</button>
+                </div>
+                <div id="calendarWallControls">
+                    <label for="calendarGridCols">Grid Cols:</label>
+                    <input type="number" id="calendarGridCols" value="4" min="1" max="12">
+                    <label for="calendarGridRows">Grid Rows:</label>
+                    <input type="number" id="calendarGridRows" value="3" min="1" max="12">
+                </div>
+                 <div id="calendarWheelControls" style="display: none;">
+                   <label for="dayNumberSize">Day Font Size:</label>
+                   <input type="range" id="dayNumberSize" min="20" max="200" value="42">
+                 </div>
+            </div>
+
+
+            <div id="colorCodingControlsSection">
+                <h4>Color Coding & Group Visibility</h4>
+                <label style="display: flex; align-items: center;">
+                    <input type="checkbox" id="enableColorCodingMode" style="width: auto; margin-right: 5px;"> Enable Color Coding
+                </label>
+            
+                <div id="animalColorSection" class="color-coding-section" style="display: none;">
+                    <label style="display: flex; align-items: center;">
+                        <input type="checkbox" id="enableAnimalColoring" style="width: auto; margin-right: 5px;"> Color by Chinese Animal
+                    </label>
+                    <div id="animalColorPickersContainer" style="margin-top:5px;"></div>
+                </div>
+            
+                <div id="zodiacColorSection" class="color-coding-section" style="display: none;">
+                    <label style="display: flex; align-items: center;">
+                        <input type="checkbox" id="enableZodiacColoring" style="width: auto; margin-right: 5px;"> Color by Zodiac Sign
+                    </label>
+                    <div id="zodiacColorPickersContainer" style="margin-top:5px;"></div>
+                </div>
+            </div>
+        </div>
+
+		<div id="menu">
+			<button id="alphabetical">ALPHABETICAL</button>
+            <button id="calendar">CALENDAR</button>
+			<button id="sphere">SPHERE</button>
+			<button id="helix">HELIX</button>
+			<button id="grid">GRID (BY AGE)</button>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "https://cdn.jsdelivr.net/npm/three@0.164.0/build/three.module.js",
+					"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.0/examples/jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import TWEEN from 'three/addons/libs/tween.module.js';
+			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+			import { CSS3DRenderer, CSS3DObject } from 'three/addons/renderers/CSS3DRenderer.js';
+
+			let cameraPersp, cameraOrtho, activeCamera; 
+			let scene, renderer;
+			let controls;
+            let initialCameraPosition; 
+            const FRUSTUM_SIZE = 3000; // Define frustum size as a constant
+
+            let enrichedContacts = [];
+			const objects = []; 
+            const cardElements = []; 
+			const targets = { alphabetical: [], sphere: [], helix: [], gridByAge: [], calendar: [] };
+
+            // Calendar specific variables
+            const calendarLabels = [];
+            let calendarControlsDiv, calendarWallControlsDiv, calendarWheelControlsDiv;
+            let calendarWallBtn, calendarWheelBtn, calendarFerrisBtn, dayNumberSizeSlider;
+            let calendarGridColsInput, calendarGridRowsInput;
+            let currentCalendarGridCols = 4;
+            let currentCalendarGridRows = 3;
+            let calendarLayoutMode = 'wall'; // 'wall', 'wheel', or 'ferris'
+            let currentDayNumberSize = 42;
+            const MONTH_NAME_FONT_SIZE = 150;
+
+
+            const CARD_HEIGHT = 208; 
+
+            const loadingMessage = document.getElementById('loadingMessage');
+            const errorMessageDiv = document.getElementById('errorMessage');
+            const feedbackMessageDiv = document.getElementById('feedbackMessage');
+            let cardColorPicker, cardThicknessSlider, layoutRowsInput, layoutColsInput, recenterCameraBtn, searchInput;
+            let perspectiveViewBtn, orthographicViewBtn, dimNonVisibleSwitch; 
+
+            let enableColorCodingModeCheckbox, enableAnimalColoringCheckbox, enableZodiacColoringCheckbox;
+            let animalColorSectionDiv, zodiacColorSectionDiv;
+            let animalColorPickersContainer, zodiacColorPickersContainer;
+            let isColorCodingModeActive = false;
+            let isAnimalColoringActive = false;
+            let isZodiacColoringActive = false;
+
+            // Visibility and Selection
+            const categoryVisibility = { ANIMAL: {}, ZODIAC: {} }; // Stores true/false for each category item
+            let dimNonVisibleGroups = false; // State for the dim switch
+            const selectedCategoryObjects = []; // Stores CSS3DObjects of the currently "active/focused" category group
+            let individualSelectedObjects = []; // Stores individually clicked CSS3DObjects
+
+            const CHINESE_ANIMALS = ["RAT", "OX", "TIGER", "RABBIT", "DRAGON", "SNAKE", "HORSE", "GOAT", "MONKEY", "ROOSTER", "DOG", "PIG"];
+            const ZODIAC_SIGNS = ["ARIES", "TAURUS", "GEMINI", "CANCER", "LEO", "VIRGO", "LIBRA", "SCORPIO", "SAGITTARIUS", "CAPRICORN", "AQUARIUS", "PISCES"];
+            const CHINESE_ANIMALS_YEARS = [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031];
+            const ZODIAC_MONTH_NUMBERS = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2];
+            let animalColors = {}; 
+            let zodiacColors = {}; 
+
+            function hexToRgb(hex) { /* ... */ 
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
+            }
+            function rgbToHsl(r, g, b) { /* ... */ 
+                r /= 255, g /= 255, b /= 255;
+                const max = Math.max(r, g, b), min = Math.min(r, g, b);
+                let h, s, l = (max + min) / 2;
+                if (max === min) { h = s = 0; } else {
+                    const d = max - min;
+                    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                    switch (max) {
+                        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                        case g: h = (b - r) / d + 2; break;
+                        case b: h = (r - g) / d + 4; break;
+                    }
+                    h /= 6;
+                }
+                return [h, s, l];
+            }
+            function hslToRgb(h, s, l) { /* ... */ 
+                let r, g, b;
+                if (s === 0) { r = g = b = l; } else {
+                    const hue2rgb = (p, q, t) => {
+                        if (t < 0) t += 1; if (t > 1) t -= 1;
+                        if (t < 1 / 6) return p + (q - p) * 6 * t;
+                        if (t < 1 / 2) return q;
+                        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                        return p;
+                    };
+                    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                    const p = 2 * l - q;
+                    r = hue2rgb(p, q, h + 1 / 3); g = hue2rgb(p, q, h); b = hue2rgb(p, q, h - 1 / 3);
+                }
+                return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+            }
+            function rgbToHex(r, g, b) { /* ... */ 
+                 return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+            }
+            function desaturateColor(hexColor, amount = 0.5) { /* ... */ 
+                const rgb = hexToRgb(hexColor);
+                if (!rgb) return hexColor;
+                let [h, s, l] = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                s = Math.max(0, Math.min(1, s * (1 - amount)));
+                const [newR, newG, newB] = hslToRgb(h, s, l);
+                return rgbToHex(newR, newG, newB);
+            }
+            const BASE_RAINBOW_SPECTRUM_COLORS = [ "#FF0000", "#FF7F00", "#FFFF00", "#7FFF00", "#00FF00", "#00FF7F", "#00FFFF", "#007FFF", "#0000FF", "#7F00FF", "#FF00FF", "#FF007F" ];
+            const DESATURATED_RAINBOW_COLORS = BASE_RAINBOW_SPECTRUM_COLORS.map(color => desaturateColor(color, 0.5));
+            const DEFAULT_ANIMAL_COLORS = DESATURATED_RAINBOW_COLORS;
+            const DEFAULT_ZODIAC_COLORS = DESATURATED_RAINBOW_COLORS;
+            let currentCardBaseColor = '#007F7F'; 
+            let currentCardThickness = 0; 
+            let currentLayoutRows = 10;
+            let currentLayoutCols = 10;
+            const COMPLETENESS_FIELDS = ['Name', 'Year', 'Month', 'Day', 'ZODIAC', 'ANIMAL', 'ELEMENT'];
+            const MIN_ALPHA_COMPLETENESS = 0.20; 
+            const MAX_ALPHA_COMPLETENESS = 0.95;
+            function darkenColor(rgb, percent) { /* ... */ 
+                const factor = 1 - percent / 100;
+                return { r: Math.max(0, Math.round(rgb.r * factor)), g: Math.max(0, Math.round(rgb.g * factor)), b: Math.max(0, Math.round(rgb.b * factor)) };
+            }
+            function parseCSV(csvText) { /* ... */ 
+                const lines = csvText.trim().split('\n');
+                if (lines.length < 2) return [];
+                const headers = lines[0].trim().split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(h => h.trim().replace(/^"|"$/g, ''));
+                const data = [];
+                for (let i = 1; i < lines.length; i++) {
+                    if (lines[i].trim() === '') continue;
+                    const values = lines[i].trim().split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    const entry = {};
+                    headers.forEach((header, index) => { entry[header] = values[index] ? values[index].trim().replace(/^"|"$/g, '') : ''; });
+                    data.push(entry);
+                }
+                return data;
+            }
+            function calculateAge(year, month, day) { /* ... */ 
+                if (!year || !month || !day || isNaN(parseInt(year)) || isNaN(parseInt(month)) || isNaN(parseInt(day))) return null;
+                const birthDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                if (isNaN(birthDate.getTime())) return null;
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) { age--; }
+                return age >= 0 ? age : null;
+            }
+            function getBirthDateObject(year, month, day) { /* ... */ 
+                if (!year || !month || !day || isNaN(parseInt(year)) || isNaN(parseInt(month)) || isNaN(parseInt(day))) return null;
+                const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                return isNaN(date.getTime()) ? null : date;
+            }
+            function getNameInitials(name) { /* ... */ 
+                if (!name || typeof name !== 'string') return '??';
+                const parts = name.trim().split(/\s+/);
+                if (parts.length === 0 || parts[0] === "") return "??";
+                if (parts.length === 1) { return parts[0].substring(0, 2).toUpperCase(); }
+                return (parts[0].substring(0, 1) + (parts.length > 1 ? parts[parts.length - 1].substring(0, 1) : '')).toUpperCase();
+            }
+            function calculateCompletenessScore(contact) { /* ... */ 
+                let filledFields = 0;
+                COMPLETENESS_FIELDS.forEach(field => { if (contact[field] && contact[field].trim() !== '') { filledFields++; } });
+                return COMPLETENESS_FIELDS.length > 0 ? filledFields / COMPLETENESS_FIELDS.length : 1;
+            }
+            function showFeedbackMessage(message, type = 'success') { /* ... */ 
+                feedbackMessageDiv.textContent = message;
+                feedbackMessageDiv.className = 'show'; 
+                if (type === 'select') { feedbackMessageDiv.classList.add('select'); } 
+                else { feedbackMessageDiv.classList.remove('select'); }
+                setTimeout(() => { feedbackMessageDiv.classList.remove('show'); }, 2500);
+            }
+
+            async function loadContactsAndInit() {
+                try {
+                    cardColorPicker = document.getElementById('cardColorPicker');
+                    cardThicknessSlider = document.getElementById('cardThicknessSlider');
+                    layoutRowsInput = document.getElementById('layoutRows');
+                    layoutColsInput = document.getElementById('layoutCols');
+                    recenterCameraBtn = document.getElementById('recenterCameraBtn');
+                    perspectiveViewBtn = document.getElementById('perspectiveViewBtn');
+                    orthographicViewBtn = document.getElementById('orthographicViewBtn');
+                    searchInput = document.getElementById('searchInput');
+                    dimNonVisibleSwitch = document.getElementById('dimNonVisibleSwitch'); 
+                    
+                    // Calendar controls
+                    calendarControlsDiv = document.getElementById('calendarControls');
+                    calendarWallControlsDiv = document.getElementById('calendarWallControls');
+                    calendarWheelControlsDiv = document.getElementById('calendarWheelControls');
+                    calendarWallBtn = document.getElementById('calendarWallBtn');
+                    calendarWheelBtn = document.getElementById('calendarWheelBtn');
+                    calendarFerrisBtn = document.getElementById('calendarFerrisBtn');
+                    dayNumberSizeSlider = document.getElementById('dayNumberSize');
+                    calendarGridColsInput = document.getElementById('calendarGridCols');
+                    calendarGridRowsInput = document.getElementById('calendarGridRows');
+
+
+                    enableColorCodingModeCheckbox = document.getElementById('enableColorCodingMode');
+                    animalColorSectionDiv = document.getElementById('animalColorSection');
+                    enableAnimalColoringCheckbox = document.getElementById('enableAnimalColoring');
+                    animalColorPickersContainer = document.getElementById('animalColorPickersContainer');
+                    zodiacColorSectionDiv = document.getElementById('zodiacColorSection');
+                    enableZodiacColoringCheckbox = document.getElementById('enableZodiacColoring');
+                    zodiacColorPickersContainer = document.getElementById('zodiacColorPickersContainer');
+
+                    if (!cardColorPicker || !cardThicknessSlider || !layoutRowsInput || !layoutColsInput || !recenterCameraBtn || !perspectiveViewBtn || !orthographicViewBtn || !searchInput || !dimNonVisibleSwitch ||
+                        !calendarControlsDiv || !calendarWallControlsDiv || !calendarWheelControlsDiv || !calendarWallBtn || !calendarWheelBtn || !calendarFerrisBtn || !dayNumberSizeSlider || !calendarGridColsInput || !calendarGridRowsInput ||
+                        !enableColorCodingModeCheckbox || !animalColorSectionDiv || !enableAnimalColoringCheckbox || !animalColorPickersContainer ||
+                        !zodiacColorSectionDiv || !enableZodiacColoringCheckbox || !zodiacColorPickersContainer ) {
+                        throw new Error("One or more control elements not found in the DOM.");
+                    }
+                    currentCardBaseColor = cardColorPicker.value;
+                    currentCardThickness = parseInt(cardThicknessSlider.value);
+                    currentLayoutRows = parseInt(layoutRowsInput.value);
+                    currentLayoutCols = parseInt(layoutColsInput.value);
+                    dimNonVisibleGroups = dimNonVisibleSwitch.checked;
+                    currentCalendarGridCols = parseInt(calendarGridColsInput.value);
+                    currentCalendarGridRows = parseInt(calendarGridRowsInput.value);
+                    currentDayNumberSize = parseInt(dayNumberSizeSlider.value);
+                    document.documentElement.style.setProperty('--day-number-font-size', `${currentDayNumberSize}px`);
+                    document.documentElement.style.setProperty('--month-name-font-size', `${MONTH_NAME_FONT_SIZE}px`);
+
+
+                    // Initialize category visibility (all visible by default)
+                    CHINESE_ANIMALS.forEach(animal => categoryVisibility.ANIMAL[animal.toUpperCase()] = true);
+                    ZODIAC_SIGNS.forEach(sign => categoryVisibility.ZODIAC[sign.toUpperCase()] = true;
+
+                    // REMOVED p5.js test code
+                    
+                    populateColorPickers(animalColorPickersContainer, CHINESE_ANIMALS, animalColors, DEFAULT_ANIMAL_COLORS, CHINESE_ANIMALS_YEARS, "ANIMAL", (itemName, newColor) => {
+                        animalColors[itemName.toUpperCase()] = newColor; 
+                        if (isColorCodingModeActive && isAnimalColoringActive) updateAllCardAppearances();
+                    });
+                    populateColorPickers(zodiacColorPickersContainer, ZODIAC_SIGNS, zodiacColors, DEFAULT_ZODIAC_COLORS, ZODIAC_MONTH_NUMBERS, "ZODIAC", (itemName, newColor) => {
+                        zodiacColors[itemName.toUpperCase()] = newColor; 
+                        if (isColorCodingModeActive && isZodiacColoringActive) updateAllCardAppearances();
+                    });
+
+                    const response = await fetch('./files/books_1.csv'); 
+                    //const response = await fetch('./nobel_laureates_complete_20251019_232435.csv'); 
+                    if (!response.ok) { throw new Error(`Failed to load contacts.csv: ${response.statusText} (status ${response.status}). Check file path and server setup.`); }
+                    const csvText = await response.text();
+                    const rawContactsData = parseCSV(csvText);
+
+                    if (rawContactsData.length === 0) { console.warn("No contacts loaded from CSV or CSV is empty."); errorMessageDiv.textContent = "Warning: No contacts found in CSV."; }
+
+                    enrichedContacts = rawContactsData.map((contact, index) => {
+                        const completenessScore = calculateCompletenessScore(contact);
+                        const alpha = MIN_ALPHA_COMPLETENESS + (completenessScore * (MAX_ALPHA_COMPLETENESS - MIN_ALPHA_COMPLETENESS));
+                        return { 
+                            ...contact, originalIndex: index, age: calculateAge(contact.Year, contact.Month, contact.Day), 
+                            birthDateObj: getBirthDateObject(contact.Year, contact.Month, contact.Day), displayAlpha: alpha,
+                            ANIMAL: contact.ANIMAL ? contact.ANIMAL.toUpperCase() : '', ZODIAC: contact.ZODIAC ? contact.ZODIAC.toUpperCase() : ''
+                        };
+                    });
+                    
+                    initDOMAndListeners(); 
+                    initThreeJS(); 
+                    createTargetPositions(); 
+                    applyCardVisibility(); // Apply initial visibility
+                    
+                    if(loadingMessage) loadingMessage.style.display = 'none';
+                    transform(targets.alphabetical, 2000); 
+                    animate(); 
+
+                } catch (error) {
+                    console.error("Error during loadContactsAndInit:", error);
+                    if(loadingMessage) loadingMessage.innerHTML = `Error: ${error.message}<br/>Please check console and file paths.`;
+                    if(errorMessageDiv) errorMessageDiv.textContent = `Error: ${error.message}`;
+                }
+            }
+
+            function populateColorPickers(container, itemsArray, colorMap, defaultColorsArray, numberArray, categoryType, colorChangeCallback) {
+                container.innerHTML = ''; 
+                itemsArray.forEach((item, index) => {
+                    const itemKey = item.toUpperCase();
+                    const defaultColor = defaultColorsArray[index % defaultColorsArray.length];
+                    colorMap[itemKey] = defaultColor; 
+
+                    const pickerDiv = document.createElement('div'); 
+                    pickerDiv.className = 'color-picker-item';
+
+                    const buttonLabel = document.createElement('button'); // Changed span to button
+                    buttonLabel.className = 'category-toggle-button';
+                    // Set initial active state based on categoryVisibility
+                    if (categoryVisibility[categoryType] && categoryVisibility[categoryType][itemKey]) {
+                        buttonLabel.classList.add('active');
+                    }
+                    const numberSuffix = numberArray && numberArray[index] !== undefined ? ` (${numberArray[index]})` : '';
+                    buttonLabel.textContent = item.charAt(0).toUpperCase() + item.slice(1).toLowerCase() + numberSuffix;
+                    buttonLabel.title = "Toggle visibility for " + item + "s"; 
+                    buttonLabel.dataset.categoryType = categoryType; 
+                    buttonLabel.dataset.categoryValue = itemKey;    
+                    buttonLabel.addEventListener('click', handleCategoryToggleClick); 
+
+                    const colorInput = document.createElement('input'); 
+                    colorInput.type = 'color';
+                    colorInput.value = defaultColor; 
+                    colorInput.dataset.item = itemKey; 
+                    colorInput.addEventListener('input', (event) => { 
+                        colorChangeCallback(event.target.dataset.item, event.target.value); 
+                    });
+                    
+                    pickerDiv.appendChild(buttonLabel); 
+                    pickerDiv.appendChild(colorInput); 
+                    container.appendChild(pickerDiv);
+                });
+            }
+            
+            function handleCategoryToggleClick(event) {
+                const button = event.currentTarget;
+                const categoryType = button.dataset.categoryType;
+                const categoryValue = button.dataset.categoryValue;
+
+                // Toggle visibility state
+                categoryVisibility[categoryType][categoryValue] = !categoryVisibility[categoryType][categoryValue];
+                button.classList.toggle('active', categoryVisibility[categoryType][categoryValue]);
+
+                // Update selectedCategoryObjects and card halo
+                updateSelectedCategory(categoryType, categoryValue, categoryVisibility[categoryType][categoryValue]);
+                
+                applyCardVisibility();
+            }
+            
+            function clearIndividualSelections() {
+                individualSelectedObjects.forEach(obj => obj.element.classList.remove('card-selected'));
+                individualSelectedObjects = [];
+            }
+
+            function clearGroupSelections() {
+                selectedCategoryObjects.forEach(obj => obj.element.classList.remove('card-selected'));
+                selectedCategoryObjects.length = 0;
+                // Also deactivate toggle buttons
+                document.querySelectorAll('.category-toggle-button.active').forEach(btn => btn.classList.remove('active'));
+            }
+
+            function handleCardClick(event) {
+                const clickedElement = event.currentTarget;
+                const clickedObject = objects.find(obj => obj.element === clickedElement);
+                if (!clickedObject) return;
+
+                const isCtrlPressed = event.ctrlKey || event.metaKey;
+                
+                // Any individual click (ctrl or not) should clear the group selection
+                if (selectedCategoryObjects.length > 0) {
+                    clearGroupSelections();
+                }
+
+                if (!isCtrlPressed) {
+                    // Single click: clear all individual selections and select this one (or deselect if it was the only one)
+                    const wasAlreadySelected = clickedElement.classList.contains('card-selected') && individualSelectedObjects.length === 1;
+                    
+                    clearIndividualSelections(); // Clear only individual
+
+                    if (!wasAlreadySelected) {
+                        individualSelectedObjects.push(clickedObject);
+                        clickedElement.classList.add('card-selected');
+                    }
+                } else {
+                    // Ctrl/Cmd click: toggle this card in the individual selection
+                    const index = individualSelectedObjects.indexOf(clickedObject);
+                    if (index > -1) {
+                        // Deselect
+                        individualSelectedObjects.splice(index, 1);
+                        clickedElement.classList.remove('card-selected');
+                    } else {
+                        // Select
+                        individualSelectedObjects.push(clickedObject);
+                        clickedElement.classList.add('card-selected');
+                    }
+                }
+                event.stopPropagation(); // Prevent controls from processing the click
+            }
+
+            function focusOnObjects(objectsToFocus) {
+                if (!objectsToFocus || objectsToFocus.length === 0) return;
+
+                const box = new THREE.Box3();
+                const cardSize = new THREE.Vector3(150, CARD_HEIGHT, Math.max(currentCardThickness, 1));
+                
+                if (objectsToFocus.length === 1) {
+                    box.setFromCenterAndSize(objectsToFocus[0].position, cardSize);
+                } else {
+                    // Create a box for the first object
+                    const firstObjBox = new THREE.Box3().setFromCenterAndSize(objectsToFocus[0].position, cardSize);
+                    box.copy(firstObjBox);
+                    // Union with boxes for all other objects
+                    for (let i = 1; i < objectsToFocus.length; i++) {
+                        const objBox = new THREE.Box3().setFromCenterAndSize(objectsToFocus[i].position, cardSize);
+                        box.union(objBox);
+                    }
+                }
+
+                const center = new THREE.Vector3();
+                box.getCenter(center);
+                
+                const sizeVec = new THREE.Vector3();
+                box.getSize(sizeVec);
+
+                const duration = 1200; // 1.2 seconds
+
+                // Animate controls target to the center of the selection
+                new TWEEN.Tween(controls.target)
+                    .to({ x: center.x, y: center.y, z: center.z }, duration)
+                    .easing(TWEEN.Easing.Exponential.InOut)
+                    .start();
+
+                if (activeCamera.isPerspectiveCamera) {
+                    // Get current camera direction
+                    const direction = new THREE.Vector3().subVectors(activeCamera.position, controls.target).normalize();
+                    if (direction.lengthSq() === 0) { direction.set(0, 0.5, 1).normalize(); } // Handle (0,0,0)
+                    
+                    const size = sizeVec.length(); // Diagonal of the bounding box
+                    const newDistance = Math.max(size * 1.5, 1200); // 1.5x diagonal, min 1200 units
+                    
+                    const newPosition = new THREE.Vector3().addVectors(center, direction.multiplyScalar(newDistance));
+
+                    // Animate camera position
+                    new TWEEN.Tween(activeCamera.position)
+                        .to({ x: newPosition.x, y: newPosition.y, z: newPosition.z }, duration)
+                        .easing(TWEEN.Easing.Exponential.InOut)
+                        .start();
+                        
+                } else if (activeCamera.isOrthographicCamera) {
+                    // For Ortho, we move the camera target and tween the zoom
+                    const direction = new THREE.Vector3().subVectors(activeCamera.position, controls.target).normalize();
+                    if (direction.lengthSq() === 0) { direction.set(0, 0.5, 1).normalize(); }
+                    
+                    // Keep same distance, just change center
+                    const newPosition = new THREE.Vector3().addVectors(center, direction.multiplyScalar(activeCamera.position.distanceTo(controls.target)));
+
+                    // Animate camera position
+                    new TWEEN.Tween(activeCamera.position)
+                        .to({ x: newPosition.x, y: newPosition.y, z: newPosition.z }, duration)
+                        .easing(TWEEN.Easing.Exponential.InOut)
+                        .start();
+
+                    // Calculate and animate zoom
+                    const aspect = activeCamera.right / activeCamera.top; // aspect = (FRUSTUM_SIZE * aspect) / FRUSTUM_SIZE
+                    const requiredHeight = sizeVec.y * 1.2; // 20% padding
+                    const requiredWidth = sizeVec.x * 1.2;
+                    
+                    const currentFrustumHeight = FRUSTUM_SIZE;
+                    const currentFrustumWidth = FRUSTUM_SIZE * aspect;
+
+                    const zoomY = currentFrustumHeight / requiredHeight;
+                    const zoomX = currentFrustumWidth / requiredWidth;
+                    
+                    const newZoom = Math.min(zoomX, zoomY, 2.5); // Get smallest zoom (to fit both), cap at 2.5x
+
+                    new TWEEN.Tween(activeCamera)
+                        .to({ zoom: newZoom }, duration)
+                        .easing(TWEEN.Easing.Exponential.InOut)
+                        .onUpdate(() => activeCamera.updateProjectionMatrix())
+                        .start();
+                }
+            }
+
+
+            function updateSelectedCategory(activeCategoryType, activeCategoryValue, isNowVisible) {
+                // A group selection clears any individual selection
+                clearIndividualSelections();
+
+                selectedCategoryObjects.forEach(obj => obj.element.classList.remove('card-selected'));
+                selectedCategoryObjects.length = 0;
+
+                if (isNowVisible) {
+                    objects.forEach(obj => {
+                        const contactIndex = obj.element.__data_contact_index__;
+                        const contact = enrichedContacts[contactIndex];
+                        if (contact && 
+                            ((activeCategoryType === "ANIMAL" && contact.ANIMAL === activeCategoryValue) ||
+                             (activeCategoryType === "ZODIAC" && contact.ZODIAC === activeCategoryValue))) {
+                            selectedCategoryObjects.push(obj);
+                            obj.element.classList.add('card-selected');
+                        }
+                    });
+                }
+            }
+            
+            function recenterCamera(isCalendar = false) { 
+                 if (activeCamera && controls && initialCameraPosition) {
+                    // Clear any selections when recentering
+                    clearIndividualSelections();
+                    clearGroupSelections();
+
+                    if (isCalendar) {
+                        activeCamera.position.set(0, 3500, 7000);
+                    } else {
+                        activeCamera.position.copy(initialCameraPosition); 
+                    }
+                    activeCamera.up.set(0, 1, 0); 
+                    activeCamera.lookAt(scene.position); 
+                    if (activeCamera.isOrthographicCamera) { 
+                        activeCamera.zoom = isCalendar ? 0.15 : 0.3; 
+                        activeCamera.updateProjectionMatrix(); 
+                    }
+                    controls.target.set(0, 0, 0); controls.object.up.set(0,1,0); controls.update();
+                } else { console.warn("Cannot recenter: Camera or controls not initialized."); }
+            }
+            function switchCameraView(viewType) { /* ... */ 
+                if (viewType === 'perspective' && activeCamera !== cameraPersp) {
+                    activeCamera = cameraPersp; perspectiveViewBtn.classList.add('active-view'); orthographicViewBtn.classList.remove('active-view');
+                } else if (viewType === 'orthographic' && activeCamera !== cameraOrtho) {
+                    activeCamera = cameraOrtho; orthographicViewBtn.classList.add('active-view'); perspectiveViewBtn.classList.remove('active-view');
+                    const aspect = window.innerWidth / window.innerHeight; 
+                    cameraOrtho.left = FRUSTUM_SIZE * aspect / -2; cameraOrtho.right = FRUSTUM_SIZE * aspect / 2;
+                    cameraOrtho.top = FRUSTUM_SIZE / 2; cameraOrtho.bottom = FRUSTUM_SIZE / -2;
+                    cameraOrtho.up.set(0,1,0); cameraOrtho.updateProjectionMatrix();
+                }
+                controls.object = activeCamera; controls.object.up.set(0,1,0); controls.update(); render();
+            }
+            
+            function handleSearchInput() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                objects.forEach(obj => {
+                    obj.element.classList.remove('search-highlight');
+                });
+                applyCardVisibility();
+            }
+            
+            function applyCardVisibility() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                const searchActive = searchTerm !== "";
+
+                objects.forEach(obj => {
+                    const element = obj.element;
+                    const contactIndex = element.__data_contact_index__;
+                    if (typeof contactIndex !== 'number') return;
+                    const contact = enrichedContacts[contactIndex];
+                    if (!contact) return;
+
+                    let isCategoryVisible = false;
+                    if (enableAnimalColoringCheckbox.checked && contact.ANIMAL && categoryVisibility.ANIMAL[contact.ANIMAL]) {
+                        isCategoryVisible = true;
+                    }
+                    if (!isCategoryVisible && enableZodiacColoringCheckbox.checked && contact.ZODIAC && categoryVisibility.ZODIAC[contact.ZODIAC]) {
+                        isCategoryVisible = true;
+                    }
+                    if (!enableAnimalColoringCheckbox.checked && !enableZodiacColoringCheckbox.checked) {
+                        isCategoryVisible = true;
+                    }
+
+                    element.classList.remove('hidden-by-visibility', 'dimmed-by-visibility', 'dimmed-by-search', 'search-highlight');
+                    element.style.pointerEvents = ''; // Reset pointer events
+
+                    if (!isCategoryVisible) {
+                        if (dimNonVisibleGroups) {
+                            element.classList.add('dimmed-by-visibility');
+                        } else {
+                            element.classList.add('hidden-by-visibility');
+                        }
+                    } else { 
+                        if (searchActive) {
+                            const searchableText = [
+                                contact.Name, getNameInitials(contact.Name), contact.age !== null ? String(contact.age) : '',
+                                (contact.Month && contact.Day) ? `${String(contact.Month).padStart(2,'0')}/${String(contact.Day).padStart(2,'0')}/${contact.Year || 'YYYY'}` : '',
+                                contact.ZODIAC, contact.ANIMAL, contact.ELEMENT
+                            ].join(' ').toLowerCase();
+                            if (searchableText.includes(searchTerm)) {
+                                element.classList.add('search-highlight');
+                            } else {
+                                element.classList.add('dimmed-by-search');
+                            }
+                        }
+                    }
+
+                    // Ensure hidden/dimmed cards aren't clickable
+                    if(element.classList.contains('hidden-by-visibility') || element.classList.contains('dimmed-by-visibility')) {
+                         element.style.pointerEvents = 'none';
+                    }
+                });
+                render();
+            }
+
+
+            function initDOMAndListeners() {
+                const handleLayoutButtonClick = (target, showCalendarControls = false) => {
+                    calendarControlsDiv.style.display = showCalendarControls ? 'block' : 'none';
+                    calendarLabels.forEach(label => label.element.style.display = showCalendarControls ? 'block' : 'none');
+                    
+                    // Clear selections when changing layout
+                    clearIndividualSelections();
+                    clearGroupSelections();
+
+                    if (showCalendarControls) {
+                        recenterCamera(true);
+                    } else if (document.activeElement.id.includes('Btn')) {
+                         recenterCamera(false);
+                    }
+
+                    transform(target, 2000);
+                }
+
+                document.getElementById('alphabetical').addEventListener( 'click', () => handleLayoutButtonClick(targets.alphabetical) );
+                document.getElementById('sphere').addEventListener( 'click', () => handleLayoutButtonClick(targets.sphere) );
+                document.getElementById('helix').addEventListener( 'click', () => handleLayoutButtonClick(targets.helix) );
+                document.getElementById('grid').addEventListener( 'click', () => handleLayoutButtonClick(targets.gridByAge) );
+                
+                document.getElementById('calendar').addEventListener('click', () => {
+                    createCalendarLayout();
+                    handleLayoutButtonClick(targets.calendar, true);
+                });
+
+                const handleCalendarLayoutChange = () => {
+                    currentCalendarGridCols = parseInt(calendarGridColsInput.value) || 4;
+                    currentCalendarGridRows = parseInt(calendarGridRowsInput.value) || 3;
+                    createCalendarLayout();
+                    handleLayoutButtonClick(targets.calendar, true);
+                };
+                calendarGridColsInput.addEventListener('change', handleCalendarLayoutChange);
+                calendarGridRowsInput.addEventListener('change', handleCalendarLayoutChange);
+
+                const setCalendarMode = (mode) => {
+                    calendarLayoutMode = mode;
+                    calendarWallBtn.classList.remove('active-mode');
+                    calendarWheelBtn.classList.remove('active-mode');
+                    calendarFerrisBtn.classList.remove('active-mode');
+
+                    if (mode === 'wall') {
+                        calendarWallBtn.classList.add('active-mode');
+                        calendarWallControlsDiv.style.display = 'block';
+                        calendarWheelControlsDiv.style.display = 'none';
+                    } else { // wheel or ferris
+                        calendarWallControlsDiv.style.display = 'none';
+                        calendarWheelControlsDiv.style.display = 'block';
+                        if (mode === 'wheel') calendarWheelBtn.classList.add('active-mode');
+                        else calendarFerrisBtn.classList.add('active-mode');
+                    }
+                    createCalendarLayout();
+                    handleLayoutButtonClick(targets.calendar, true);
+                };
+                calendarWallBtn.addEventListener('click', () => setCalendarMode('wall'));
+                calendarWheelBtn.addEventListener('click', () => setCalendarMode('wheel'));
+                calendarFerrisBtn.addEventListener('click', () => setCalendarMode('ferris'));
+
+                dayNumberSizeSlider.addEventListener('input', (event) => {
+                    currentDayNumberSize = parseInt(event.target.value);
+                    document.documentElement.style.setProperty('--day-number-font-size', `${currentDayNumberSize}px`);
+                });
+
+
+                if(recenterCameraBtn) recenterCameraBtn.addEventListener('click', () => {
+                    // Make button do the same as the 'F' key
+                    const allSelected = [...individualSelectedObjects, ...selectedCategoryObjects];
+                    if (allSelected.length > 0) {
+                        focusOnObjects(allSelected);
+                    } else {
+                        recenterCamera(calendarControlsDiv.style.display === 'block');
+                    }
+                });
+                if(perspectiveViewBtn) perspectiveViewBtn.addEventListener('click', () => switchCameraView('perspective'));
+                if(orthographicViewBtn) orthographicViewBtn.addEventListener('click', () => switchCameraView('orthographic'));
+                
+                if(cardColorPicker) cardColorPicker.addEventListener('input', (event) => { currentCardBaseColor = event.target.value; updateAllCardAppearances(); });
+                if(cardThicknessSlider) cardThicknessSlider.addEventListener('input', (event) => { currentCardThickness = parseInt(event.target.value); updateAllCardAppearances(); });
+                if(searchInput) searchInput.addEventListener('input', handleSearchInput);
+                
+                if(dimNonVisibleSwitch) dimNonVisibleSwitch.addEventListener('change', (event) => {
+                    dimNonVisibleGroups = event.target.checked;
+                    applyCardVisibility();
+                });
+
+                if(enableColorCodingModeCheckbox) enableColorCodingModeCheckbox.addEventListener('change', (event) => {
+                    isColorCodingModeActive = event.target.checked;
+                    animalColorSectionDiv.style.display = isColorCodingModeActive ? 'block' : 'none';
+                    zodiacColorSectionDiv.style.display = isColorCodingModeActive ? 'block' : 'none';
+                    if (!isColorCodingModeActive) { 
+                        enableAnimalColoringCheckbox.checked = false; isAnimalColoringActive = false;
+                        enableZodiacColoringCheckbox.checked = false; isZodiacColoringActive = false;
+                    }
+                    updateAllCardAppearances();
+                    applyCardVisibility();
+                });
+                if(enableAnimalColoringCheckbox) enableAnimalColoringCheckbox.addEventListener('change', (event) => { 
+                    isAnimalColoringActive = event.target.checked; 
+                    updateAllCardAppearances(); 
+                    applyCardVisibility();
+                });
+                if(enableZodiacColoringCheckbox) enableZodiacColoringCheckbox.addEventListener('change', (event) => { 
+                    isZodiacColoringActive = event.target.checked; 
+                    updateAllCardAppearances(); 
+                    applyCardVisibility();
+                });
+
+                function handleLayoutInputChange() {
+                    currentLayoutRows = parseInt(layoutRowsInput.value) || 10; currentLayoutCols = parseInt(layoutColsInput.value) || 10;
+                    createTargetPositions(); 
+                    showFeedbackMessage("Layout parameters changed. Click a layout button to apply.", "select");
+                }
+                if(layoutRowsInput) layoutRowsInput.addEventListener('change', handleLayoutInputChange);
+                if(layoutColsInput) layoutColsInput.addEventListener('change', handleLayoutInputChange);
+
+                window.addEventListener('keydown', (event) => { 
+                    if (event.key.toLowerCase() === 'f') { 
+                        event.preventDefault(); // Prevent browser 'find'
+                        const allSelected = [...individualSelectedObjects, ...selectedCategoryObjects];
+                        if (allSelected.length > 0) {
+                            focusOnObjects(allSelected);
+                        } else {
+                            recenterCamera(calendarControlsDiv.style.display === 'block');
+                        }
+                    } 
+                });
+                window.addEventListener( 'resize', onWindowResize );
+            }
+
+            function updateAllCardAppearances() { 
+                 objects.forEach(obj => { 
+                    const element = obj.element;
+                    const contactIndex = element.__data_contact_index__;
+                    if (typeof contactIndex !== 'number') { return; }
+                    const contact = enrichedContacts[contactIndex];
+                    if (!contact) return;
+
+                    let finalCardColorHex = currentCardBaseColor; 
+                    if (isColorCodingModeActive) {
+                        let colorSetByMode = false;
+                        if (isAnimalColoringActive && contact.ANIMAL && animalColors[contact.ANIMAL]) { finalCardColorHex = animalColors[contact.ANIMAL]; colorSetByMode = true; }
+                        if (!colorSetByMode && isZodiacColoringActive && contact.ZODIAC && zodiacColors[contact.ZODIAC]) { finalCardColorHex = zodiacColors[contact.ZODIAC]; }
+                    }
+                    const baseRgb = hexToRgb(finalCardColorHex);
+                    if (!baseRgb) { 
+                        const fallbackRgb = hexToRgb(currentCardBaseColor) || hexToRgb("#CCCCCC"); 
+                        element.style.backgroundColor = `rgba(${fallbackRgb.r}, ${fallbackRgb.g}, ${fallbackRgb.b}, ${contact.displayAlpha})`;
+                        const edgeFallbackRgb = darkenColor(fallbackRgb, 20);
+                        if (!element.classList.contains('search-highlight') && !element.classList.contains('card-selected')) {
+                            element.style.borderColor = `rgba(${fallbackRgb.r}, ${fallbackRgb.g}, ${fallbackRgb.b}, 0.45)`;
+                            element.style.boxShadow = `0px 0px 12px rgba(${fallbackRgb.r}, ${fallbackRgb.g}, ${fallbackRgb.b}, 0.65)`;
+                        }
+                        const initialsDivFallback = element.querySelector('.initials');
+                        if(initialsDivFallback) { initialsDivFallback.style.textShadow = `0 0 8px rgba(${fallbackRgb.r}, ${fallbackRgb.g}, ${fallbackRgb.b}, 0.95)`;}
+                        const edgeDivFallback = element.querySelector('.edge');
+                        if (edgeDivFallback) { edgeDivFallback.style.backgroundColor = `rgba(${edgeFallbackRgb.r}, ${edgeFallbackRgb.g}, ${edgeFallbackRgb.b}, ${contact.displayAlpha * 0.9})`;}
+                        return; 
+                    }
+                    const edgeRgb = darkenColor(baseRgb, 20); 
+                    element.style.backgroundColor = `rgba(${baseRgb.r}, ${baseRgb.g}, ${baseRgb.b}, ${contact.displayAlpha})`;
+                    if (!element.classList.contains('search-highlight') && !element.classList.contains('card-selected')) {
+                        element.style.borderColor = `rgba(${baseRgb.r}, ${baseRgb.g}, ${baseRgb.b}, 0.45)`;
+                        element.style.boxShadow = `0px 0px 12px rgba(${baseRgb.r}, ${baseRgb.g}, ${baseRgb.b}, 0.65)`;
+                    }
+                    const initialsDiv = element.querySelector('.initials');
+                    if(initialsDiv) { initialsDiv.style.textShadow = `0 0 8px rgba(${baseRgb.r}, ${baseRgb.g}, ${baseRgb.b}, 0.95)`;}
+                    const edgeDiv = element.querySelector('.edge');
+                    if (edgeDiv) {
+                        edgeDiv.style.backgroundColor = `rgba(${edgeRgb.r}, ${edgeRgb.g}, ${edgeRgb.b}, ${contact.displayAlpha * 0.9})`;
+                        edgeDiv.style.display = currentCardThickness === 0 ? 'none' : 'block';
+                        edgeDiv.style.transform = `translateZ(-${currentCardThickness}px)`;
+                    }
+                });
+            }
+            
+			function initThreeJS() {
+				cameraPersp = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 20000 );
+                initialCameraPosition = new THREE.Vector3(2500, 1500, 3500); 
+				cameraPersp.position.copy(initialCameraPosition); cameraPersp.up.set(0,1,0); cameraPersp.lookAt(new THREE.Vector3(0,0,0)); 
+                const aspect = window.innerWidth / window.innerHeight; 
+                cameraOrtho = new THREE.OrthographicCamera(FRUSTUM_SIZE * aspect / -2, FRUSTUM_SIZE * aspect / 2, FRUSTUM_SIZE / 2, FRUSTUM_SIZE / -2, 1, 20000 );
+                cameraOrtho.position.copy(initialCameraPosition); cameraOrtho.up.set(0,1,0); cameraOrtho.lookAt(new THREE.Vector3(0,0,0));
+                cameraOrtho.zoom = 0.3; cameraOrtho.updateProjectionMatrix();
+                activeCamera = cameraPersp; 
+				scene = new THREE.Scene();
+
+				for ( let i = 0; i < enrichedContacts.length; i ++ ) {
+                    const contact = enrichedContacts[i];
+					const element = document.createElement( 'div' ); element.className = 'element';
+                    
+                    // Add click listener for selection
+                    element.addEventListener('click', handleCardClick);
+
+					const objectCSS = new CSS3DObject( element ); 
+                    objectCSS.element.__data_contact_index__ = i; 
+                    cardElements.push(element); 
+
+                    const edgeDiv = document.createElement('div'); edgeDiv.className = 'edge'; element.appendChild(edgeDiv);
+					const ageDiv = document.createElement( 'div' ); ageDiv.className = 'age'; ageDiv.textContent = contact.age !== null ? contact.age : 'N/A'; element.appendChild( ageDiv );
+					const initialsDiv = document.createElement( 'div' ); initialsDiv.className = 'initials'; initialsDiv.textContent = getNameInitials(contact.Name); element.appendChild( initialsDiv );
+                    const nameDiv = document.createElement( 'div' ); nameDiv.className = 'name'; nameDiv.textContent = contact.Name || 'Unknown Name'; element.appendChild( nameDiv );
+                    const detailsSection = document.createElement('div'); detailsSection.className = 'details-section';
+                    const dob = (contact.Month && contact.Day) ? `${String(contact.Month).padStart(2,'0')}/${String(contact.Day).padStart(2,'0')}/${contact.Year || 'YYYY'}` : 'N/A';
+                    const birthdateDiv = document.createElement('div'); birthdateDiv.className = 'detail-item'; birthdateDiv.innerHTML = `<strong>DOB:</strong> ${dob}`; detailsSection.appendChild(birthdateDiv);
+                    const zodiacDivElement = document.createElement('div'); zodiacDivElement.className = 'detail-item'; zodiacDivElement.innerHTML = `<strong>Zodiac:</strong> ${contact.ZODIAC_EMOJI || ''} ${contact.ZODIAC || 'N/A'}`; detailsSection.appendChild(zodiacDivElement);
+                    const animalDivElement = document.createElement('div'); animalDivElement.className = 'detail-item'; animalDivElement.innerHTML = `<strong>Animal:</strong> ${contact.ANIMAL_EMOJI || ''} ${contact.ANIMAL || 'N/A'}`; detailsSection.appendChild(animalDivElement);
+                    const elementInfoDiv = document.createElement('div'); elementInfoDiv.className = 'detail-item'; elementInfoDiv.innerHTML = `<strong>Element:</strong> ${contact.ELEMENT || 'N/A'}`; detailsSection.appendChild(elementInfoDiv);
+                    element.appendChild(detailsSection);
+
+					objectCSS.position.x = Math.random() * 6000 - 3000; objectCSS.position.y = Math.random() * 6000 - 3000; objectCSS.position.z = Math.random() * 6000 - 3000;
+					scene.add( objectCSS );
+					objects.push( objectCSS ); 
+				}
+                updateAllCardAppearances(); 
+				renderer = new CSS3DRenderer(); 
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.getElementById( 'container' ).appendChild( renderer.domElement );
+
+				controls = new TrackballControls( activeCamera, renderer.domElement ); 
+                controls.target.set(0, 0, 0); controls.object.up.set(0,1,0); 
+				controls.minDistance = 200; controls.maxDistance = 18000; 
+                controls.addEventListener( 'change', render); 
+            }
+            
+            function createTargetPositions() { 
+                const numObjects = objects.length; if (numObjects === 0) return;
+                const cardWidthWithMargin = 150 + 40; const cardHeightWithMargin = CARD_HEIGHT + 40; const cardDepthWithMargin = CARD_HEIGHT + 100; 
+                function generateCuboidTargets(sortedContactsArray, targetArrayName) {
+                    targets[targetArrayName] = new Array(numObjects); 
+                    const itemsPerLayer = currentLayoutRows * currentLayoutCols;
+                    for (let i = 0; i < sortedContactsArray.length; i++) { 
+                        const sortedContact = sortedContactsArray[i]; const object = new THREE.Object3D();
+                        const layerIndex = Math.floor(i / itemsPerLayer); const indexInLayer = i % itemsPerLayer;
+                        const col = indexInLayer % currentLayoutCols; const row = Math.floor(indexInLayer / currentLayoutCols);
+                        object.position.x = (col * cardWidthWithMargin) - ((currentLayoutCols - 1) * cardWidthWithMargin / 2);
+                        object.position.y = -(row * cardHeightWithMargin) + ((currentLayoutRows - 1) * cardHeightWithMargin / 2);
+                        object.position.z = -layerIndex * cardDepthWithMargin + ( (Math.ceil(numObjects/itemsPerLayer) -1) * cardDepthWithMargin / 2) ; 
+                        if (targets[targetArrayName][sortedContact.originalIndex] === undefined) { targets[targetArrayName][sortedContact.originalIndex] = object; } 
+                        else { console.warn("Duplicate assignment in target array for", targetArrayName, "at originalIndex", sortedContact.originalIndex); }
+                    }
+                    for(let i=0; i < numObjects; i++){ if(!targets[targetArrayName][i]){ const fallbackObject = new THREE.Object3D(); fallbackObject.position.set(0,0,0); targets[targetArrayName][i] = fallbackObject;}}
+                }
+                const sortedAlphabeticalContacts = [...enrichedContacts].sort((a, b) => (a.Name || '').localeCompare(b.Name || ''));
+                generateCuboidTargets(sortedAlphabeticalContacts, 'alphabetical');
+                const sortedByAgeContacts = [...enrichedContacts].sort((a, b) => {
+                    if (a.age === null && b.age === null) return 0; if (a.age === null) return 1; if (b.age === null) return -1;
+                    if (a.age !== b.age) return a.age - b.age; if (a.birthDateObj && b.birthDateObj) return a.birthDateObj - b.birthDateObj; return 0;
+                });
+                generateCuboidTargets(sortedByAgeContacts, 'gridByAge');
+				const vectorSphere = new THREE.Vector3(); const sphereRadius = Math.max(1200, numObjects * 3.5); 
+                targets.sphere = new Array(numObjects); 
+				for ( let i = 0; i < numObjects; i ++ ) {
+					const phi = Math.acos( - 1 + ( 2 * i ) / numObjects ); const theta = Math.sqrt( numObjects * Math.PI ) * phi;
+					const object = new THREE.Object3D(); object.position.setFromSphericalCoords( sphereRadius, phi, theta );
+					vectorSphere.copy( object.position ).multiplyScalar( 2 ); object.lookAt( vectorSphere ); targets.sphere[i] = object;
+				}
+                const vectorHelix = new THREE.Vector3(); const helixRadius = Math.max(1000, numObjects * 2.5); const helixVerticalSpacing = 25; 
+                targets.helix = new Array(numObjects); 
+				for ( let i = 0; i < numObjects; i ++ ) {
+					const theta = i * 0.175 + Math.PI; const y = - ( i * helixVerticalSpacing ) + (numObjects * helixVerticalSpacing / 2) ;
+					const object = new THREE.Object3D(); object.position.setFromCylindricalCoords( helixRadius, theta, y );
+                    vectorHelix.x = object.position.x * 2; vectorHelix.y = object.position.y; vectorHelix.z = object.position.z * 2;
+					object.lookAt( vectorHelix ); targets.helix[i] = object;
+				}
+                targets.calendar = new Array(objects.length).fill(new THREE.Object3D());
+            }
+
+            function createCalendarLayout() {
+                calendarLabels.forEach(label => scene.remove(label));
+                calendarLabels.length = 0;
+                targets.calendar = new Array(objects.length);
+
+                switch (calendarLayoutMode) {
+                    case 'wall':
+                        createCalendarWallLayout();
+                        break;
+                    case 'wheel':
+                        createCalendarWheelLayout(false); // Not Ferris Wheel mode
+                        break;
+                    case 'ferris':
+                        createCalendarWheelLayout(true); // Is Ferris Wheel mode
+                        break;
+                }
+            }
+
+            function createGridLine(start, end) {
+                const element = document.createElement('div');
+                element.className = 'calendar-grid-line';
+                const object = new CSS3DObject(element);
+
+                const distance = start.distanceTo(end);
+                element.style.width = `${distance}px`;
+                element.style.height = '2px';
+
+                object.position.copy(start).lerp(end, 0.5);
+                object.lookAt(end);
+                return object;
+            }
+            
+            function createCalendarWallLayout() {
+                const dayCellWidth = 250, dayCellHeight = 320, monthCellPadding = 400, cardStackOffset = 30;
+                const monthCellWidth = (7 * dayCellWidth) + monthCellPadding;
+                const monthCellHeight = (6 * dayCellHeight) + monthCellPadding;
+                const totalGridWidth = currentCalendarGridCols * monthCellWidth;
+                const totalGridHeight = currentCalendarGridRows * monthCellHeight;
+                const dayStacks = new Map(), year = new Date().getFullYear();
+                const offscreenTarget = new THREE.Object3D();
+                offscreenTarget.position.set(0, -20000, 0);
+
+                for (let month = 0; month < 12; month++) {
+                    const monthGridCol = month % currentCalendarGridCols;
+                    const monthGridRow = Math.floor(month / currentCalendarGridCols);
+                    const monthAnchorX = (monthGridCol * monthCellWidth) - (totalGridWidth / 2) + (monthCellWidth / 2);
+                    const monthAnchorY = -(monthGridRow * monthCellHeight) + (totalGridHeight / 2) - (monthCellHeight / 2);
+                    
+                    const monthName = `${month + 1} - ${new Date(year, month).toLocaleString('default', { month: 'long' }).toUpperCase()}`;
+                    const monthLabelEl = document.createElement('div');
+                    monthLabelEl.className = 'calendar-label calendar-label-month-name';
+                    monthLabelEl.textContent = monthName;
+                    const monthLabelObj = new CSS3DObject(monthLabelEl);
+                    monthLabelObj.position.set(monthAnchorX, monthAnchorY + (dayCellHeight * 3.5), 0);
+                    scene.add(monthLabelObj);
+                    calendarLabels.push(monthLabelObj);
+
+                    const firstDayOfMonth = new Date(year, month, 1).getDay();
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                     for (let day = 1; day <= daysInMonth; day++) {
+                        const dayOfWeek = new Date(year, month, day).getDay();
+                        const weekOfMonth = Math.floor((day - 1 + firstDayOfMonth) / 7);
+                        const xPos = monthAnchorX + (dayOfWeek * dayCellWidth) - (dayCellWidth * 3);
+                        const yPos = monthAnchorY - (weekOfMonth * dayCellHeight) + (dayCellHeight * 1.5);
+                        const el = document.createElement('div');
+                        el.className = 'calendar-label';
+                        el.textContent = day;
+                        const obj = new CSS3DObject(el);
+                        obj.position.set(xPos, yPos, -150);
+                        scene.add(obj);
+                        calendarLabels.push(obj);
+                        dayStacks.set(`${month}-${day}`, 0);
+                    }
+                }
+
+                enrichedContacts.forEach(contact => {
+                    if (contact.birthDateObj) {
+                        const month = contact.birthDateObj.getMonth();
+                        const day = contact.birthDateObj.getDate();
+                        const monthGridCol = month % currentCalendarGridCols;
+                        const monthGridRow = Math.floor(month / currentCalendarGridCols);
+                        const monthAnchorX = (monthGridCol * monthCellWidth) - (totalGridWidth / 2) + (monthCellWidth / 2);
+                        const monthAnchorY = -(monthGridRow * monthCellHeight) + (totalGridHeight / 2) - (monthCellHeight / 2);
+                        const firstDayOfMonth = new Date(year, month, 1).getDay();
+                        const dayOfWeek = new Date(year, month, day).getDay();
+                        const weekOfMonth = Math.floor((day - 1 + firstDayOfMonth) / 7);
+                        const stackIndex = dayStacks.get(`${month}-${day}`);
+                        const object = new THREE.Object3D();
+                        object.position.x = monthAnchorX + (dayOfWeek * dayCellWidth) - (dayCellWidth * 3);
+                        object.position.y = monthAnchorY - (weekOfMonth * dayCellHeight) + (dayCellHeight * 1.5);
+                        object.position.z = stackIndex * cardStackOffset;
+                        targets.calendar[contact.originalIndex] = object;
+                        dayStacks.set(`${month}-${day}`, stackIndex + 1);
+                    } else {
+                        targets.calendar[contact.originalIndex] = offscreenTarget;
+                    }
+                });
+            }
+
+            function createCalendarWheelLayout(isUpright) {
+                const wheelRadius = 5500; 
+                const dayCellWidth = 150; 
+                const dayCellHeight = 160; 
+                const cardStackOffset = 30;
+                const dayStacks = new Map(), year = new Date().getFullYear();
+                const offscreenTarget = new THREE.Object3D();
+                offscreenTarget.position.set(0, -20000, 0);
+
+                for (let month = 0; month < 12; month++) {
+                    const monthAngle = (month - 2.5) * -(Math.PI * 2 / 12); 
+
+                    const monthAnchor = new THREE.Object3D();
+                    monthAnchor.position.x = wheelRadius * Math.cos(monthAngle);
+                    monthAnchor.position.y = wheelRadius * Math.sin(monthAngle);
+                    if (!isUpright) {
+                        monthAnchor.rotation.z = monthAngle - Math.PI / 2;
+                    }
+                    monthAnchor.updateMatrixWorld(true);
+
+                    const monthName = `${month + 1} - ${new Date(year, month).toLocaleString('default', { month: 'long' }).toUpperCase()}`;
+                    const localLabelPos = new THREE.Vector3(0, 750, 0); 
+                    const worldLabelPos = localLabelPos.clone().applyMatrix4(monthAnchor.matrixWorld);
+                    const monthLabelEl = document.createElement('div');
+                    monthLabelEl.className = 'calendar-label calendar-label-month-name';
+                    monthLabelEl.textContent = monthName;
+                    const monthLabelObj = new CSS3DObject(monthLabelEl);
+                    monthLabelObj.position.copy(worldLabelPos);
+                    if (!isUpright) { monthLabelObj.rotation.z = monthAnchor.rotation.z; }
+                    scene.add(monthLabelObj);
+                    calendarLabels.push(monthLabelObj);
+                    
+                    const firstDayOfMonth = new Date(year, month, 1).getDay();
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    const numWeeks = Math.ceil((daysInMonth + firstDayOfMonth) / 7);
+
+                    const gridWidth = 7 * dayCellWidth;
+                    const gridHeight = numWeeks * dayCellHeight;
+                    for(let i = 0; i <= numWeeks; i++) {
+                        const start = new THREE.Vector3(-gridWidth/2, (gridHeight/2) - (i*dayCellHeight) , -100);
+                        const end = new THREE.Vector3(gridWidth/2, (gridHeight/2) - (i*dayCellHeight) , -100);
+                        const line = createGridLine(start.applyMatrix4(monthAnchor.matrixWorld), end.applyMatrix4(monthAnchor.matrixWorld));
+                         if (!isUpright) { line.rotation.z += monthAnchor.rotation.z; }
+                        scene.add(line);
+                        calendarLabels.push(line);
+                    }
+                    for(let i = 0; i <= 7; i++) {
+                        const start = new THREE.Vector3(-gridWidth/2 + (i*dayCellWidth), (gridHeight/2) , -100);
+                        const end = new THREE.Vector3(-gridWidth/2 + (i*dayCellWidth), -(gridHeight/2) , -100);
+                        const line = createGridLine(start.applyMatrix4(monthAnchor.matrixWorld), end.applyMatrix4(monthAnchor.matrixWorld));
+                         if (!isUpright) { line.rotation.z += monthAnchor.rotation.z; }
+                        scene.add(line);
+                        calendarLabels.push(line);
+                    }
+
+                     for (let day = 1; day <= daysInMonth; day++) {
+                        const dayOfWeek = new Date(year, month, day).getDay();
+                        const weekOfMonth = Math.floor((day - 1 + firstDayOfMonth) / 7);
+                        const localX = (dayOfWeek * dayCellWidth) - (gridWidth/2 - dayCellWidth/2);
+                        const localY = -(weekOfMonth * dayCellHeight) + (gridHeight/2 - dayCellHeight/2);
+                        
+                        const el = document.createElement('div');
+                        el.className = 'calendar-label';
+                        el.textContent = day;
+                        const dayLabelObj = new CSS3DObject(el);
+                        const localDayPos = new THREE.Vector3(localX, localY, -150);
+                        dayLabelObj.position.copy(localDayPos.clone().applyMatrix4(monthAnchor.matrixWorld));
+                        if (!isUpright) { dayLabelObj.rotation.z = monthAnchor.rotation.z; }
+                        scene.add(dayLabelObj);
+                        calendarLabels.push(dayLabelObj);
+
+                        dayStacks.set(`${month}-${day}`, 0);
+                    }
+                }
+
+                enrichedContacts.forEach(contact => {
+                    if (contact.birthDateObj) {
+                        const month = contact.birthDateObj.getMonth();
+                        const day = contact.birthDateObj.getDate();
+                        const monthAngle = (month - 2.5) * -(Math.PI * 2 / 12);
+
+                        const firstDayOfMonth = new Date(year, month, 1).getDay();
+                        const daysInMonth = new Date(year, month + 1, 0).getDate();
+                        const numWeeks = Math.ceil((daysInMonth + firstDayOfMonth) / 7);
+                        const gridWidth = 7 * dayCellWidth;
+                        const gridHeight = numWeeks * dayCellHeight;
+
+                        const dayOfWeek = new Date(year, month, day).getDay();
+                        const weekOfMonth = Math.floor((day - 1 + firstDayOfMonth) / 7);
+                        const stackIndex = dayStacks.get(`${month}-${day}`);
+
+                        const localX = (dayOfWeek * dayCellWidth) - (gridWidth/2 - dayCellWidth/2);
+                        const localY = -(weekOfMonth * dayCellHeight) + (gridHeight/2 - dayCellHeight/2);
+                        const localZ = stackIndex * cardStackOffset;
+                        
+                        const objectTarget = new THREE.Object3D();
+                        objectTarget.position.set(localX, localY, localZ);
+                        
+                        const monthRotation = isUpright ? 0 : monthAngle - Math.PI / 2;
+                        const monthRotationMatrix = new THREE.Matrix4().makeRotationZ(monthRotation);
+
+                        objectTarget.position.applyMatrix4(monthRotationMatrix);
+                        objectTarget.position.add(new THREE.Vector3(wheelRadius * Math.cos(monthAngle), wheelRadius * Math.sin(monthAngle), 0));
+                        
+                        objectTarget.rotation.z = monthRotation;
+
+                        targets.calendar[contact.originalIndex] = objectTarget;
+                        dayStacks.set(`${month}-${day}`, stackIndex + 1);
+                    } else {
+                        targets.calendar[contact.originalIndex] = offscreenTarget;
+                    }
+                });
+            }
+
+			function transform( targetArray, duration ) {
+				TWEEN.removeAll();
+				objects.forEach( object => { 
+                    const originalContactIndex = object.element.__data_contact_index__;
+					const target = targetArray[originalContactIndex]; 
+                    if (!target) { 
+                        const offscreenTarget = new THREE.Object3D();
+                        offscreenTarget.position.set(0, 0, -20000);
+                        new TWEEN.Tween( object.position ).to( { x: offscreenTarget.position.x, y: offscreenTarget.position.y, z: offscreenTarget.position.z }, Math.random() * duration + duration ).easing( TWEEN.Easing.Exponential.InOut ).start();
+					    new TWEEN.Tween( object.rotation ).to( { x: 0, y: 0, z: 0 }, Math.random() * duration + duration ).easing( TWEEN.Easing.Exponential.InOut ).start();
+                        return; 
+                    }
+					new TWEEN.Tween( object.position ).to( { x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration ).easing( TWEEN.Easing.Exponential.InOut ).start();
+					new TWEEN.Tween( object.rotation ).to( { x: target.rotation.x, y: target.rotation.y, z: target.rotation.z }, Math.random() * duration + duration ).easing( TWEEN.Easing.Exponential.InOut ).start();
+				});
+                
+				new TWEEN.Tween( {} ).to( {}, duration * 2 ).onUpdate(render).start();
+			}
+
+			function onWindowResize() {
+                if(activeCamera && renderer) {
+                    cameraPersp.aspect = window.innerWidth / window.innerHeight;
+                    cameraPersp.updateProjectionMatrix();
+                    const aspect = window.innerWidth / window.innerHeight;
+                    cameraOrtho.left = FRUSTUM_SIZE * aspect / -2;
+                    cameraOrtho.right = FRUSTUM_SIZE * aspect / 2;
+                    cameraOrtho.top = FRUSTUM_SIZE / 2;
+                    cameraOrtho.bottom = FRUSTUM_SIZE / -2;
+                    cameraOrtho.updateProjectionMatrix();
+                    renderer.setSize( window.innerWidth, window.innerHeight );
+                    render();
+                }
+			}
+
+			function animate() { 
+                requestAnimationFrame( animate ); 
+                TWEEN.update(); 
+                controls.update(); 
+            }
+			function render() { 
+                if(renderer && scene && activeCamera) { 
+                    renderer.render( scene, activeCamera ); 
+                } 
+            }
+
+            loadContactsAndInit();
+		</script>
+	</body>
+</html>

@@ -1,0 +1,119 @@
+GUID,Atomic Number,Name,Symbol,Rarity Tier,Rarity Number,Color,Color Emoji,State at STP,Atomic Weight,Price per Gram (USD),Price per Gram (RMB),Rarity Ranking Earth,Rarity Ranking Universe,Electron Configuration,Electronegativity,Melting Point (°C),Boiling Point (°C),Density (g/cm³),Year of Discovery,Common Uses
+element_001_hydrogen,1,Hydrogen,H,Common,2,Colorless,-,Gas,1.01,0.02,0.14,10,1,-,2.2,-259.16,-252.87,0.00008988,1766,"Fuel, industrial chemical, energy storage"
+element_002_helium,2,Helium,He,Uncommon,3,Colorless,-,Gas,4,0.15,1.09,71,2,-,0,-272.2,-268.93,0.0001785,1895,"Balloons, cryogenics, welding"
+element_003_lithium,3,Lithium,Li,Uncommon,3,Silvery-White,-,Solid,6.94,45,323,31,26,-,0.98,180.5,1342,0.534,1817,"Batteries, ceramics, lubricants"
+element_004_beryllium,4,Beryllium,Be,Rare,4,Steel-Grey,-,Solid,9.01,850,"6,115.00",48,44,-,1.57,1287,2470,1.85,1797,"Alloys, nuclear reactors, aerospace"
+element_005_boron,5,Boron,B,Uncommon,3,Black,-,Solid,10.81,6,43,38,17,-,2.04,2075,3927,2.34,1808,"Glass, ceramics, semiconductors"
+element_006_carbon,6,Carbon,C,Ubiquitous,1,Black,-,Solid,12.01,0.1,0.72,15,4,-,2.55,3550,4827,2.267,-3750,"Fuel, structural material, organic chemistry"
+element_007_nitrogen,7,Nitrogen,N,Common,2,Colorless,-,Gas,14.01,0.01,0.04,29,7,-,3.04,-210,-195.79,0.0012506,1772,"Fertilizers, refrigerants, inert atmosphere"
+element_008_oxygen,8,Oxygen,O,Ubiquitous,1,Colorless,-,Gas,16,0.01,0.05,1,3,-,3.44,-218.79,-182.95,0.001429,1774,"Respiration, combustion, medical"
+element_009_fluorine,9,Fluorine,F,Uncommon,3,Pale Yellow,-,Gas,19,2,14,54,18,-,3.98,-219.62,-188.12,0.0016966,1886,"Refrigerants, propellants, etching"
+element_010_neon,10,Neon,Ne,Rare,4,Colorless,-,Gas,20.18,330,"2,375.00",78,5,-,0,-248.59,-246.08,0.0008999,1898,"Neon lights, lasers"
+element_011_sodium,11,Sodium,Na,Common,2,Silvery-White,-,Solid,22.99,2.5,18,6,11,-,0.93,97.72,882.9,0.968,1807,"Salt, streetlights, nuclear reactors"
+element_012_magnesium,12,Magnesium,Mg,Common,2,Shiny Grey,-,Solid,24.31,3,22,8,9,-,1.31,650,1091,1.738,1755,"Alloys, flares, medicine"
+element_013_aluminium,13,Aluminium,Al,Ubiquitous,1,Silvery,-,Solid,26.98,0.02,0.14,3,12,-,1.61,660.32,2519,2.7,1825,"Aircraft, packaging, construction"
+element_014_silicon,14,Silicon,Si,Common,2,Grey,-,Solid,28.09,0.5,3.6,2,10,-,1.9,1414,3265,2.329,1823,"Semiconductors, glass, ceramics"
+element_015_phosphorus,15,Phosphorus,P,Uncommon,3,White/Waxy,-,Solid,30.97,0.3,2.2,11,16,-,2.19,44.1,280.5,1.82,1669,"Fertilizers, detergents, matches"
+element_016_sulfur,16,Sulfur,S,Common,2,Yellow,-,Solid,32.06,0.05,0.36,16,15,-,2.58,115.21,444.6,2.07,-1000,"Sulfuric acid, fertilizers, gunpowder"
+element_017_chlorine,17,Chlorine,Cl,Uncommon,3,Greenish-Yellow,-,Gas,35.45,0.1,0.72,21,13,-,3.16,-101.5,-34.04,0.003214,1774,"Disinfectant, PVC, bleach"
+element_018_argon,18,Argon,Ar,Uncommon,3,Colorless,-,Gas,39.95,0.5,3.6,56,14,-,0,-189.34,-185.84,0.0017837,1894,"Welding, lighting, inert atmosphere"
+element_019_potassium,19,Potassium,K,Common,2,Silvery-White,-,Solid,39.1,30,216,7,19,-,0.82,63.5,759,0.862,1807,"Fertilizers, soap, glass"
+element_020_calcium,20,Calcium,Ca,Common,2,Dull Silver,-,Solid,40.08,0.2,1.44,5,20,-,1,842,1484,1.55,1808,"Bones, cement, antacids"
+element_021_scandium,21,Scandium,Sc,Rare,4,Silvery-White,-,Solid,44.96,"4,000.00","28,770.00",50,45,-,1.36,1541,2836,2.989,1879,"Aerospace, sports equipment, lighting"
+element_022_titanium,22,Titanium,Ti,Common,2,Silvery,-,Solid,47.87,6,43,9,21,-,1.54,1668,3287,4.506,1791,"Aerospace, medical implants, pigments"
+element_023_vanadium,23,Vanadium,V,Uncommon,3,Silvery-Grey,-,Solid,50.94,8,57,22,22,-,1.63,1910,3407,6.11,1830,"Steel alloys, catalysts"
+element_024_chromium,24,Chromium,Cr,Common,2,Silvery,-,Solid,52,0.5,3.6,23,23,-,1.66,1857,2671,7.19,1797,"Stainless steel, plating, pigments"
+element_025_manganese,25,Manganese,Mn,Common,2,Metallic Grey,-,Solid,54.94,0.08,0.58,12,24,-,1.55,1246,2061,7.21,1774,"Steel alloys, batteries, fertilizers"
+element_026_iron,26,Iron,Fe,Ubiquitous,1,Lustrous Metallic,-,Solid,55.85,0.01,0.04,4,6,-,1.83,1538,2862,7.874,-1000,"Steel, construction, magnets"
+element_027_cobalt,27,Cobalt,Co,Uncommon,3,Metallic Blue-Grey,-,Solid,58.93,20,144,30,25,-,1.88,1495,2927,8.9,1735,"Batteries, magnets, pigments"
+element_028_nickel,28,Nickel,Ni,Common,2,Lustrous,-,Solid,58.69,0.02,0.14,24,27,-,1.91,1455,2913,8.908,1751,"Stainless steel, coins, batteries"
+element_029_copper,29,Copper,Cu,Ubiquitous,1,Reddish-Orange,-,Solid,63.55,0.01,0.06,26,29,-,1.9,1084.62,2562,8.96,-3500,"Electrical wiring, plumbing, coins"
+element_030_zinc,30,Zinc,Zn,Common,2,Bluish-White,-,Solid,65.38,0,0.03,25,30,-,1.65,419.53,907,7.14,1746,"Galvanizing, batteries, brass"
+element_031_gallium,31,Gallium,Ga,Uncommon,3,Silvery-White,-,Solid,69.72,3,22,36,31,-,1.81,29.76,2204,5.904,1875,"Semiconductors, LEDs, thermometers"
+element_032_germanium,32,Germanium,Ge,Rare,4,Greyish-White,-,Solid,72.63,10,72,52,32,-,2.01,938.25,2833,5.323,1886,"Semiconductors, fiber optics, infrared optics"
+element_033_arsenic,33,Arsenic,As,Uncommon,3,Metallic Grey,-,Solid,74.92,0.8,5.75,55,33,-,2.18,817,614,5.727,1250,"Pesticides, semiconductors, wood preservatives"
+element_034_selenium,34,Selenium,Se,Common,2,Black/Red,-,Solid,78.97,0.1,0.72,67,34,-,2.55,221,685,4.81,1817,"Photocells, rectifiers, antidandruff shampoos"
+element_035_bromine,35,Bromine,Br,Uncommon,3,Reddish-Brown,-,Liquid,79.9,0.2,1.44,62,35,-,2.96,-7.2,58.8,3.1028,1826,"Flame retardants, disinfectants, pharmaceuticals"
+element_036_krypton,36,Krypton,Kr,Rare,4,Colorless,-,Gas,83.8,100,719,81,36,-,3,-157.36,-153.22,0.003749,1898,"Lighting, lasers, photography"
+element_037_rubidium,37,Rubidium,Rb,Uncommon,3,Silvery-White,-,Solid,85.47,80,575,23,37,-,0.82,39.3,688,1.532,1861,"Atomic clocks, photocells, special glass"
+element_038_strontium,38,Strontium,Sr,Common,2,Silvery-Yellow,-,Solid,87.62,0.5,3.6,15,38,-,0.95,777,1382,2.64,1790,"Fireworks, flares, medical imaging"
+element_039_yttrium,39,Yttrium,Y,Rare,4,Silvery-Metallic,-,Solid,88.91,250,"1,798.00",29,39,-,1.22,1522,3336,4.472,1843,"LEDs, lasers, superconductors"
+element_040_zirconium,40,Zirconium,Zr,Common,2,Silvery-White,-,Solid,91.22,1,7.2,18,40,-,1.33,1855,4377,6.52,1789,"Nuclear reactors, ceramics, surgical instruments"
+element_041_niobium,41,Niobium,Nb,Uncommon,3,Lustrous Grey,-,Solid,92.91,15,108,33,41,-,1.6,2477,4744,8.57,1801,"Superconducting magnets, alloys, aerospace"
+element_042_molybdenum,42,Molybdenum,Mo,Common,2,Silvery-White,-,Solid,95.96,0.8,5.75,53,42,-,2.16,2623,4639,10.28,1778,"Steel alloys, catalysts, lubricants"
+element_043_technetium,43,Technetium,Tc,Very Rare,,Silvery-Grey,-,Solid,98,"5,000.00","35,965.00",88,43,-,1.9,2172,4265,11,1937,"Medical imaging, corrosion inhibitor"
+element_044_ruthenium,44,Ruthenium,Ru,Rare,4,Silvery-White,-,Solid,101.07,"1,000.00","7,193.00",74,46,-,2.2,2334,4150,12.45,1844,"Electrical contacts, catalysts, alloys"
+element_045_rhodium,45,Rhodium,Rh,Rare,4,Silvery-White,-,Solid,102.91,"2,000.00","14,387.00",76,47,-,2.28,1964,3695,12.41,1803,"Catalytic converters, jewelry, electrical contacts"
+element_046_palladium,46,Palladium,Pd,Rare,4,Silvery-White,-,Solid,106.42,"1,500.00","10,790.00",65,48,-,2.2,1554.9,2963,12.02,1803,"Catalytic converters, jewelry, dentistry"
+element_047_silver,47,Silver,Ag,Uncommon,3,Polished Silver,-,Solid,107.87,0.8,5.75,66,49,-,1.93,961.78,2162,10.49,-3000,"Jewelry, coinage, photography"
+element_048_cadmium,48,Cadmium,Cd,Common,2,Silvery-White,-,Solid,112.41,0.05,0.36,64,50,-,1.69,321.07,767,8.65,1817,"Batteries, pigments, nuclear reactors"
+element_049_indium,49,Indium,In,Uncommon,3,Silvery-White,-,Solid,114.82,10,72,61,51,-,1.78,156.6,2072,7.31,1863,"LCD screens, solders, semiconductors"
+element_050_tin,50,Tin,Sn,Common,2,Silvery,-,Solid,118.71,0.03,0.22,49,52,-,1.88,231.93,2602,7.265,-3500,"Solders, coatings, alloys"
+element_051_antimony,51,Antimony,Sb,Uncommon,3,Silvery-White,-,Solid,121.76,0.5,3.6,63,53,-,2.05,630.63,1587,6.697,1450,"Flame retardants, batteries, semiconductors"
+element_052_tellurium,52,Tellurium,Te,Rare,4,Silvery-White,-,Solid,127.6,5,36,72,54,-,2.1,449.5,988,6.24,1782,"Semiconductors, solar cells, alloys"
+element_053_iodine,53,Iodine,I,Uncommon,3,Violet-Black,-,Solid,126.9,0.1,0.72,60,55,-,2.66,113.7,184.3,4.93,1811,"Antiseptic, thyroid treatment, photography"
+element_054_xenon,54,Xenon,Xe,Rare,4,Colorless,-,Gas,131.29,200,"1,439.00",83,56,-,2.6,-111.7,-108.09,0.005894,1898,"Lighting, lasers, anesthesia"
+element_055_cesium,55,Cesium,Cs,Uncommon,3,Silvery-Gold,-,Solid,132.91,50,360,46,57,-,0.79,28.4,671,1.879,1860,"Atomic clocks, drilling fluids, photocells"
+element_056_barium,56,Barium,Ba,Common,2,Silvery,-,Solid,137.33,0.8,5.75,14,58,-,0.89,727,1897,3.51,1808,"Fireworks, pigments, medical imaging"
+element_057_lanthanum,57,Lanthanum,La,Uncommon,3,Silvery-White,-,Solid,138.91,10,72,28,59,-,1.1,920,3464,6.162,1839,"Camera lenses, catalysts, lighter flints"
+element_058_cerium,58,Cerium,Ce,Common,2,Silvery-White,-,Solid,140.12,0.5,3.6,25,60,-,1.12,795,3443,6.77,1803,"Catalysts, polishing powders, lighter flints"
+element_059_praseodymium,59,Praseodymium,Pr,Uncommon,3,Silvery-Yellow,-,Solid,140.91,15,108,39,61,-,1.13,935,3520,6.77,1885,"Magnets, lasers, pigments"
+element_060_neodymium,60,Neodymium,Nd,Uncommon,3,Silvery-Yellow,-,Solid,144.24,20,144,27,62,-,1.14,1024,3074,7.01,1885,"Magnets, lasers, glass coloring"
+element_061_promethium,61,Promethium,Pm,Very Rare,,Metallic,-,Solid,145,"8,000.00","57,540.00",89,63,-,1.13,1042,3000,7.26,1945,"Atomic batteries, luminous paint"
+element_062_samarium,62,Samarium,Sm,Uncommon,3,Silvery,-,Solid,150.36,25,180,40,64,-,1.17,1072,1794,7.52,1879,"Magnets, nuclear reactors, lasers"
+element_063_europium,63,Europium,Eu,Rare,4,Silvery,-,Solid,151.96,100,719,58,65,-,1.2,822,1529,5.244,1896,"Red phosphors in TVs, fluorescent lamps"
+element_064_gadolinium,64,Gadolinium,Gd,Uncommon,3,Silvery-White,-,Solid,157.25,30,216,41,66,-,1.2,1312,3273,7.9,1886,"MRI contrast agents, nuclear reactors, magnets"
+element_065_terbium,65,Terbium,Tb,Rare,4,Silvery-Grey,-,Solid,158.93,40,288,59,67,-,1.2,1356,3230,8.23,1843,"Lasers, phosphors, magnetostrictive alloys"
+element_066_dysprosium,66,Dysprosium,Dy,Rare,4,Silvery,-,Solid,162.5,50,360,42,68,-,1.22,1412,2567,8.55,1886,"Magnets, lasers, nuclear reactors"
+element_067_holmium,67,Holmium,Ho,Rare,4,Silvery-White,-,Solid,164.93,60,432,55,69,-,1.23,1474,2720,8.79,1878,"Lasers, magnets, colorant for glass"
+element_068_erbium,68,Erbium,Er,Uncommon,3,Silvery,-,Solid,167.26,35,252,44,70,-,1.24,1529,2868,9.066,1843,"Lasers, optical fibers, glass colorant"
+element_069_thulium,69,Thulium,Tm,Rare,4,Silvery-Grey,-,Solid,168.93,70,503,61,71,-,1.25,1545,1950,9.32,1879,"Lasers, portable X-ray machines"
+element_070_ytterbium,70,Ytterbium,Yb,Uncommon,3,Silvery-White,-,Solid,173.04,45,324,43,72,-,1.1,819,1196,6.9,1878,"Lasers, atomic clocks, stress gauges"
+element_071_lutetium,71,Lutetium,Lu,Rare,4,Silvery-White,-,Solid,174.97,80,575,60,73,-,1.27,1663,3402,9.84,1907,"Catalysts, medical imaging, high-refractive-index glass"
+element_072_hafnium,72,Hafnium,Hf,Uncommon,3,Silvery-Grey,-,Solid,178.49,20,144,45,74,-,1.3,2233,4603,13.31,1923,"Nuclear reactors, superalloys, light bulbs"
+element_073_tantalum,73,Tantalum,Ta,Rare,4,Grey,-,Solid,180.95,150,"1,079.00",51,75,-,1.5,3017,5458,16.69,1802,"Capacitors, surgical implants, jet engines"
+element_074_tungsten,74,Tungsten,W,Uncommon,3,Greyish-White,-,Solid,183.84,30,216,57,76,-,2.36,3422,5930,19.25,1783,"Light bulb filaments, heating elements, alloys"
+element_075_rhenium,75,Rhenium,Re,Rare,4,Silvery-White,-,Solid,186.21,300,"2,158.00",79,77,-,1.9,3186,5596,21.02,1925,"Jet engines, rocket engines, electrical contacts"
+element_076_osmium,76,Osmium,Os,Rare,4,Bluish-Grey,-,Solid,190.23,500,"3,596.00",77,78,-,2.2,3033,5012,22.59,1803,"Electrical contacts, fountain pen tips, instrument pivots"
+element_077_iridium,77,Iridium,Ir,Rare,4,Silvery-White,-,Solid,192.22,800,"5,754.00",75,79,-,2.2,2446,4428,22.56,1803,"Spark plugs, crucibles, medical implants"
+element_078_platinum,78,Platinum,Pt,Rare,4,Silvery-White,-,Solid,195.08,30,216,80,80,-,2.28,1768.3,3825,21.45,1735,"Catalytic converters, jewelry, laboratory equipment"
+element_079_gold,79,Gold,Au,Rare,4,Metallic Yellow,-,Solid,196.97,60,432,73,81,-,2.54,1064.18,2856,19.3,-3500,"Jewelry, coinage, electronics"
+element_080_mercury,80,Mercury,Hg,Uncommon,3,Silvery-White,-,Liquid,200.59,0.5,3.6,67,82,-,2,-38.83,356.73,13.534,-3500,"Thermometers, barometers, fluorescent lamps"
+element_081_thallium,81,Thallium,Tl,Very Rare,,Silvery-White,-,Solid,204.38,100,719,70,83,-,1.62,304,1473,11.85,1861,"Photocells, infrared detectors, medical imaging"
+element_082_lead,82,Lead,Pb,Common,2,Metallic Grey,-,Solid,207.2,0,0.01,36,84,-,1.87,327.46,1749,11.34,-3500,"Batteries, radiation shielding, ammunition"
+element_083_bismuth,83,Bismuth,Bi,Common,2,Silvery,-,Solid,208.98,0.01,0.07,69,85,-,2.02,271.4,1564,9.78,-3500,"Alloys, cosmetics, pharmaceuticals"
+element_084_polonium,84,Polonium,Po,Very Rare,,Silvery,-,Solid,209,"10,000,000.00","71,930,000.00",86,86,-,2,254,962,9.196,1898,"Antistatic brushes, nuclear power"
+element_085_astatine,85,Astatine,At,Legendary,5,Black,-,Solid,210,"50,000,000.00","359,650,000.00",87,87,-,2.2,302,337,7,1940,Scientific research
+element_086_radon,86,Radon,Rn,Rare,4,Colorless,-,Gas,222,"20,000.00","143,860.00",84,88,-,2.2,-71,-61.7,0.00973,1900,"Medical research, radiation therapy"
+element_087_francium,87,Francium,Fr,Legendary,5,Metallic,-,Solid,223,"100,000,000.00","719,300,000.00",90,89,-,0.7,27,677,1.87,1939,Scientific research
+element_088_radium,88,Radium,Ra,Very Rare,,Silvery-White,-,Solid,226,"500,000.00","3,596,500.00",85,90,-,0.9,700,1737,5,1898,"Luminous paint, medical treatment"
+element_089_actinium,89,Actinium,Ac,Legendary,5,Silvery,-,Solid,227,"20,000,000.00","143,860,000.00",91,91,-,1.1,1050,3200,10.07,1899,Scientific research
+element_090_thorium,90,Thorium,Th,Uncommon,3,Silvery,-,Solid,232.04,1,7.2,37,92,-,1.3,1750,4788,11.72,1828,"Nuclear fuel, gas mantles, alloys"
+element_091_protactinium,91,Protactinium,Pa,Very Rare,,Silvery-Grey,-,Solid,231.04,"100,000.00","719,300.00",92,93,-,1.5,1572,4027,15.37,1913,Scientific research
+element_092_uranium,92,Uranium,U,Very Rare,,Silvery-Grey,-,Solid,238.03,100,719,47,94,-,1.38,1132.2,4131,19.1,1789,"Nuclear fuel, counterweights, armor"
+element_093_neptunium,93,Neptunium,Np,Legendary,5,Silvery,-,Solid,237,"500,000.00","3,596,500.00",93,95,-,1.36,639,3902,20.45,1940,Scientific research
+element_094_plutonium,94,Plutonium,Pu,Legendary,5,Silvery,-,Solid,244,"6,000.00","43,150.00",94,96,-,1.28,640,3228,19.84,1940,"Nuclear weapons, nuclear power"
+element_095_americium,95,Americium,Am,Legendary,5,Silvery,-,Solid,243,"100,000.00","719,300.00",95,97,-,1.13,1173,2607,13.6,1944,"Smoke detectors, scientific research"
+element_096_curium,96,Curium,Cm,Legendary,5,Silvery,-,Solid,247,"150,000.00","1,078,950.00",96,98,-,1.13,1340,3100,13.5,1944,Scientific research
+element_097_berkelium,97,Berkelium,Bk,Legendary,5,Silvery,-,Solid,247,"300,000.00","2,157,900.00",97,99,-,1.13,986,2627,14.78,1949,Scientific research
+element_098_californium,98,Californium,Cf,Legendary,5,Silvery,-,Solid,251,"27,000,000.00","194,000,000.00",98,100,-,1.13,900,1747,15.1,1950,"Neutron source, scientific research"
+element_099_einsteinium,99,Einsteinium,Es,Legendary,5,Silvery,-,Solid,252,"20,000,000.00","143,860,000.00",99,101,-,1.13,860,991,8.84,1952,Scientific research
+element_100_fermium,100,Fermium,Fm,Legendary,5,Metallic,-,Solid,257,"50,000,000.00","359,650,000.00",100,102,-,1.13,1527,1800,8.9,1952,Scientific research
+element_101_mendelevium,101,Mendelevium,Md,Legendary,5,Metallic,-,Solid,258,"80,000,000.00","575,440,000.00",101,103,-,1.13,827,1700,10.3,1955,Scientific research
+element_102_nobelium,102,Nobelium,No,Legendary,5,Metallic,-,Solid,259,"100,000,000.00","719,300,000.00",102,104,-,1.13,827,1700,9.9,1966,Scientific research
+element_103_lawrencium,103,Lawrencium,Lr,Legendary,5,Metallic,-,Solid,262,"120,000,000.00","863,160,000.00",103,105,-,1.13,1627,1800,16.6,1961,Scientific research
+element_104_rutherfordium,104,Rutherfordium,Rf,Legendary,5,Metallic,-,Solid,267,"150,000,000.00","1,078,950,000.00",104,106,-,1.3,2100,5500,23.2,1964,Scientific research
+element_105_dubnium,105,Dubnium,Db,Legendary,5,Metallic,-,Solid,268,"180,000,000.00","1,294,620,000.00",105,107,-,1.3,2100,5500,29.3,1968,Scientific research
+element_106_seaborgium,106,Seaborgium,Sg,Legendary,5,Metallic,-,Solid,269,"200,000,000.00","1,438,600,000.00",106,108,-,1.3,2100,5500,35,1974,Scientific research
+element_107_bohrium,107,Bohrium,Bh,Legendary,5,Metallic,-,Solid,270,"220,000,000.00","1,576,460,000.00",107,109,-,1.3,2100,5500,37.1,1976,Scientific research
+element_108_hassium,108,Hassium,Hs,Legendary,5,Metallic,-,Solid,277,"250,000,000.00","1,798,250,000.00",108,110,-,1.3,2100,5500,40.7,1984,Scientific research
+element_109_meitnerium,109,Meitnerium,Mt,Legendary,5,Metallic,-,Solid,276,"280,000,000.00","2,014,040,000.00",109,111,-,1.3,2100,5500,37.4,1982,Scientific research
+element_110_darmstadtium,110,Darmstadtium,Ds,Legendary,5,Metallic,-,Solid,281,"300,000,000.00","2,157,900,000.00",110,112,-,1.3,2100,5500,34.8,1994,Scientific research
+element_111_roentgenium,111,Roentgenium,Rg,Legendary,5,Metallic,-,Solid,282,"320,000,000.00","2,301,760,000.00",111,113,-,1.3,2100,5500,28.7,1994,Scientific research
+element_112_copernicium,112,Copernicium,Cn,Legendary,5,Metallic,-,Liquid,285,"350,000,000.00","2,517,550,000.00",112,114,-,1.3,2100,67,14,1996,Scientific research
+element_113_nihonium,113,Nihonium,Nh,Legendary,5,Metallic,-,Solid,286,"380,000,000.00","2,733,340,000.00",113,115,-,1.3,430,1430,16,2003,Scientific research
+element_114_flerovium,114,Flerovium,Fl,Legendary,5,Metallic,-,Gas,289,"400,000,000.00","2,877,200,000.00",114,116,-,1.3,-70,-10,9.9,1999,Scientific research
+element_115_moscovium,115,Moscovium,Mc,Legendary,5,Metallic,-,Solid,290,"420,000,000.00","3,019,020,000.00",115,117,-,1.3,400,1100,13.5,2003,Scientific research
+element_116_livermorium,116,Livermorium,Lv,Legendary,5,Metallic,-,Solid,293,"450,000,000.00","3,236,850,000.00",116,118,-,1.3,-10,350,12.9,2000,Scientific research
+element_117_tennessine,117,Tennessine,Ts,Legendary,5,Unknown,-,Solid,294,"480,000,000.00","3,454,680,000.00",117,119,-,1.3,300,610,7.2,2010,Scientific research
+element_118_oganesson,118,Oganesson,Og,Legendary,5,Unknown,-,Gas,294,"500,000,000.00","3,596,500,000.00",118,120,-,1.3,-100,-100,5.3,2006,Scientific research
